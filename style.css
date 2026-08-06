@@ -17,53 +17,65 @@ body {
     transition: background-color 0.6s ease;
 }
 
-/* Background shifts precisely to the warm golden-brown tone shown in the reference */
+/* Background shifts precisely to the warm tone */
 body.active {
     background-color: #27231e;
 }
 
+/* Perfect balanced container keeping items properly spaced and stationary */
 .scene-wrapper {
     position: relative;
     width: 100%;
-    max-width: 650px;
+    max-width: 760px;
     height: 100%;
     display: flex;
     flex-direction: row;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
-    padding-left: 55px;
+    gap: 75px;
+    padding: 0 20px;
 }
 
-/* Lamp Container with absolute layout control for mobile */
+/* Lamp Container remains entirely locked in place */
 .lamp-container {
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     flex-shrink: 0;
-    transform: translateX(30px);
-    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-body.active .lamp-container {
-    transform: translateX(-40px);
-}
-
-/* Perfectly shaped dome lamp shade matching the reference visual */
+/* Ultra-realistic smooth dome lamp shade matching your target reference */
 .lamp-head {
-    width: 150px;
+    width: 160px;
     height: 75px;
-    background-color: #e4e2d9;
-    border-radius: 75px 75px 6px 6px;
+    background: linear-gradient(145deg, #f0ede6, #dcd8ce);
+    border-radius: 80px 80px 8px 8px;
     position: relative;
     z-index: 2;
-    box-shadow: inset 0 -8px 15px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.5s ease, box-shadow 0.5s ease;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4), inset 0 -8px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.5s ease;
+}
+
+/* Realistic metallic bottom rim */
+.lamp-rim {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(to bottom, #d8d4cb, #b5b0a4);
+    border-radius: 0 0 8px 8px;
+    transition: background 0.5s ease;
 }
 
 body.active .lamp-head {
-    background-color: #ffffff;
-    box-shadow: 0 15px 45px rgba(255, 215, 110, 0.75), inset 0 -6px 10px rgba(0,0,0,0.05);
+    background: linear-gradient(145deg, #ffffff, #fffdf7);
+    box-shadow: 0 0 50px rgba(255, 220, 120, 0.85), inset 0 -4px 8px rgba(0,0,0,0.05);
+}
+
+body.active .lamp-rim {
+    background: linear-gradient(to bottom, #fffae6, #e6d285);
 }
 
 .lamp-stand-group {
@@ -73,38 +85,40 @@ body.active .lamp-head {
 }
 
 .lamp-stand {
-    width: 10px;
-    height: 140px;
-    background-color: #e4e2d9;
-    border-radius: 5px;
-    transition: background-color 0.5s ease;
+    width: 12px;
+    height: 150px;
+    background: linear-gradient(to right, #d8d4cb, #f0ede6, #b5b0a4);
+    border-radius: 6px;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.3);
+    transition: background 0.5s ease;
 }
 
 body.active .lamp-stand {
-    background-color: #f7f5ed;
+    background: linear-gradient(to right, #ece8df, #ffffff, #d4c8a8);
 }
 
 .lamp-base {
-    width: 85px;
-    height: 8px;
-    background-color: #e4e2d9;
-    border-radius: 4px;
-    transition: background-color 0.5s ease;
+    width: 95px;
+    height: 10px;
+    background: linear-gradient(to bottom, #e4e0d4, #b5b0a4);
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    transition: background 0.5s ease;
 }
 
 body.active .lamp-base {
-    background-color: #f7f5ed;
+    background: linear-gradient(to bottom, #fffdf7, #d4c8a8);
 }
 
-/* Immersive lamp bloom / radial lighting glow */
+/* Immersive glowing soft light bloom underneath the shade */
 .lamp-glow {
     position: absolute;
-    top: 50px;
+    top: 55px;
     left: 50%;
     transform: translateX(-50%);
-    width: 260px;
-    height: 180px;
-    background: radial-gradient(circle, rgba(255,215,100,0.4) 0%, rgba(255,180,30,0) 72%);
+    width: 280px;
+    height: 190px;
+    background: radial-gradient(circle, rgba(255,220,110,0.5) 0%, rgba(255,185,40,0.15) 50%, rgba(0,0,0,0) 75%);
     opacity: 0;
     transition: opacity 0.5s ease;
     pointer-events: none;
@@ -119,7 +133,7 @@ body.active .lamp-glow {
 .chain-wrapper {
     position: absolute;
     top: 0;
-    left: 24px;
+    left: 28px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -131,16 +145,16 @@ body.active .lamp-glow {
 
 .chain-cord {
     width: 1.5px;
-    height: 52px;
+    height: 55px;
     background-color: #888;
 }
 
 .chain-ball {
-    width: 11px;
-    height: 11px;
-    background-color: #d4af37;
+    width: 12px;
+    height: 12px;
+    background: radial-gradient(circle at 30% 30%, #ffea85, #c29b2b);
     border-radius: 50%;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.5);
 }
 
 .chain-wrapper.pull {
@@ -153,22 +167,20 @@ body.active .lamp-glow {
     100% { transform: translateY(0); }
 }
 
-/* Glassmorphic Login Box positioned comfortably to the right without covering the lamp */
+/* Glassmorphic Login Card that animates smoothly without moving the lamp */
 .login-card {
-    position: absolute;
-    right: 25px;
-    background: rgba(30, 27, 24, 0.82);
+    background: rgba(32, 29, 26, 0.85);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
     border: 1px solid rgba(255, 215, 0, 0.15);
-    padding: 32px 24px;
+    padding: 34px 26px;
     border-radius: 24px;
-    width: 245px;
+    width: 260px;
     text-align: left;
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.75);
     opacity: 0;
     visibility: hidden;
-    transform: scale(0.9) translateX(15px);
+    transform: scale(0.9) translateY(10px);
     transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     z-index: 10;
 }
@@ -176,7 +188,7 @@ body.active .lamp-glow {
 .login-card.active {
     opacity: 1;
     visibility: visible;
-    transform: scale(1) translateX(0);
+    transform: scale(1) translateY(0);
 }
 
 .login-card h2 {
