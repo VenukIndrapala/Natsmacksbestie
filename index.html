@@ -9,12 +9,15 @@
 </head>
 <body>
     <div class="scene-wrapper">
-        <!-- Lamp Component meticulously matched to the reference image -->
+        <!-- Lamp Component with stationary positioning -->
         <div class="lamp-container">
-            <div class="lamp-head"></div>
+            <div class="lamp-shade-shadow"></div>
+            <div class="lamp-head">
+                <div class="lamp-rim"></div>
+            </div>
             <div class="lamp-stand-group">
                 <div class="lamp-stand"></div>
-                <!-- Pull Chain positioned right underneath the lamp shade -->
+                <!-- Pull Chain positioned right under the lamp shade -->
                 <div class="chain-wrapper" id="chainToggle">
                     <div class="chain-cord"></div>
                     <div class="chain-ball"></div>
@@ -24,7 +27,7 @@
             <div class="lamp-glow"></div>
         </div>
 
-        <!-- Login Card positioned neatly to the right so it never overlaps the lamp -->
+        <!-- Login Card popping up independently without moving the lamp -->
         <div class="login-card" id="loginCard">
             <h2>Welcome</h2>
             <form onsubmit="event.preventDefault();">
