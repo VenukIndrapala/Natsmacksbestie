@@ -9,12 +9,12 @@
 </head>
 <body>
     <div class="scene-wrapper">
-        <!-- Lamp Component -->
+        <!-- Lamp Component meticulously matched to the reference image -->
         <div class="lamp-container">
             <div class="lamp-head"></div>
             <div class="lamp-stand-group">
                 <div class="lamp-stand"></div>
-                <!-- Pull Chain -->
+                <!-- Pull Chain positioned right underneath the lamp shade -->
                 <div class="chain-wrapper" id="chainToggle">
                     <div class="chain-cord"></div>
                     <div class="chain-ball"></div>
@@ -24,14 +24,19 @@
             <div class="lamp-glow"></div>
         </div>
 
-        <!-- Login Card -->
+        <!-- Login Card positioned neatly to the right so it never overlaps the lamp -->
         <div class="login-card" id="loginCard">
             <h2>Welcome</h2>
             <form onsubmit="event.preventDefault();">
                 <div class="input-group">
-                    <input type="password" placeholder="Password" required>
+                    <label>Username</label>
+                    <input type="text" placeholder="Your name" required>
                 </div>
-                <button type="submit" class="sign-in-btn">Sign in</button>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="sign-in-btn">Sign In</button>
             </form>
         </div>
     </div>
