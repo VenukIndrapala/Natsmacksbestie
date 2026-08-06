@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lamp Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Login Card with Password Field Only -->
+        <div class="login-card" id="loginCard">
+            <h2>Welcome</h2>
+            <form onsubmit="event.preventDefault();">
+                <div class="input-group">
+                    <input type="password" placeholder="Password" required>
+                </div>
+                <button type="submit" class="sign-in-btn">Sign in</button>
+            </form>
+        </div>
+
+        <!-- Lamp Component -->
+        <div class="lamp-container">
+            <div class="lamp-stand"></div>
+            <div class="lamp-head"></div>
+            <div class="lamp-glow"></div>
+            <!-- Pull Chain -->
+            <div class="chain-wrapper" id="chainToggle">
+                <div class="chain-cord"></div>
+                <div class="chain-ball"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
