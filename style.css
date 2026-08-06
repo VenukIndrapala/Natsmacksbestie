@@ -21,111 +21,48 @@ body.active {
     background-color: #24201c;
 }
 
-.container {
+/* Flexible layout container handling mobile spacing & side-by-side positioning */
+.scene-wrapper {
     position: relative;
     width: 100%;
-    max-width: 480px;
+    max-width: 420px;
     height: 100%;
     display: flex;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
+    gap: 20px;
+    padding: 0 15px;
 }
 
-/* Login Card Styling */
-.login-card {
-    position: absolute;
-    right: 25px;
-    background: rgba(30, 28, 25, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 215, 0, 0.12);
-    padding: 35px 25px;
-    border-radius: 24px;
-    width: 62%;
-    max-width: 260px;
-    text-align: center;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(15px) scale(0.95);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    z-index: 10;
-}
-
-.login-card.active {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0) scale(1);
-}
-
-.login-card h2 {
-    margin-bottom: 24px;
-    font-weight: 600;
-    color: #fff;
-    font-size: 1.4rem;
-}
-
-.input-group {
-    margin-bottom: 20px;
-    text-align: left;
-}
-
-.input-group input {
-    width: 100%;
-    padding: 12px 14px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 10px;
-    color: #fff;
-    font-size: 0.95rem;
-    outline: none;
-    transition: border-color 0.3s;
-}
-
-.input-group input:focus {
-    border-color: #ffd700;
-}
-
-.sign-in-btn {
-    width: 100%;
-    padding: 12px;
-    background: linear-gradient(135deg, #f3d56d, #d4af37);
-    border: none;
-    border-radius: 10px;
-    color: #1a1a1a;
-    font-weight: 700;
-    font-size: 0.95rem;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
-    transition: transform 0.1s;
-}
-
-.sign-in-btn:active {
-    transform: scale(0.98);
-}
-
-/* Lamp Setup matching reference visual */
+/* Lamp Setup with clean, realistic proportions */
 .lamp-container {
-    position: absolute;
-    left: 20%;
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
+    flex-shrink: 0;
+    transition: transform 0.4s ease;
+}
+
+body.active .lamp-container {
+    transform: translateX(-65px);
 }
 
 .lamp-head {
-    width: 120px;
-    height: 55px;
-    background-color: #e6e6e6;
-    border-radius: 60px 60px 0 0;
+    width: 130px;
+    height: 65px;
+    background-color: #eaeaea;
+    border-radius: 65px 65px 4px 4px;
     position: relative;
     z-index: 2;
+    box-shadow: inset 0 -5px 10px rgba(0,0,0,0.15);
     transition: background-color 0.4s ease, box-shadow 0.4s ease;
 }
 
 body.active .lamp-head {
     background-color: #ffffff;
-    box-shadow: 0 15px 35px rgba(255, 225, 120, 0.6);
+    box-shadow: 0 15px 40px rgba(255, 220, 100, 0.6), inset 0 -5px 10px rgba(0,0,0,0.05);
 }
 
 .lamp-stand-group {
@@ -135,37 +72,37 @@ body.active .lamp-head {
 }
 
 .lamp-stand {
-    width: 8px;
-    height: 120px;
-    background-color: #e6e6e6;
-    border-radius: 4px;
+    width: 6px;
+    height: 110px;
+    background-color: #eaeaea;
+    border-radius: 3px;
     transition: background-color 0.4s ease;
 }
 
 body.active .lamp-stand {
-    background-color: #f0f0f0;
+    background-color: #f5f5f5;
 }
 
 .lamp-base {
-    width: 70px;
-    height: 8px;
-    background-color: #e6e6e6;
-    border-radius: 4px;
+    width: 60px;
+    height: 6px;
+    background-color: #eaeaea;
+    border-radius: 3px;
     transition: background-color 0.4s ease;
 }
 
 body.active .lamp-base {
-    background-color: #f0f0f0;
+    background-color: #f5f5f5;
 }
 
 .lamp-glow {
     position: absolute;
-    top: 40px;
+    top: 45px;
     left: 50%;
     transform: translateX(-50%);
-    width: 200px;
-    height: 150px;
-    background: radial-gradient(circle, rgba(255,220,100,0.3) 0%, rgba(255,200,50,0) 75%);
+    width: 220px;
+    height: 160px;
+    background: radial-gradient(circle, rgba(255,220,100,0.35) 0%, rgba(255,200,50,0) 75%);
     opacity: 0;
     transition: opacity 0.4s ease;
     pointer-events: none;
@@ -176,16 +113,16 @@ body.active .lamp-glow {
     opacity: 1;
 }
 
-/* Pull Chain Styling hanging right under the lamp head next to the stand */
+/* Pull Chain */
 .chain-wrapper {
     position: absolute;
     top: 0;
-    left: 18px;
+    left: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     cursor: pointer;
-    padding: 10px;
+    padding: 12px;
     z-index: 3;
     -webkit-tap-highlight-color: transparent;
 }
@@ -193,7 +130,7 @@ body.active .lamp-glow {
 .chain-cord {
     width: 1.5px;
     height: 45px;
-    background-color: #888;
+    background-color: #999;
 }
 
 .chain-ball {
@@ -201,7 +138,7 @@ body.active .lamp-glow {
     height: 10px;
     background-color: #d4af37;
     border-radius: 50%;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.4);
 }
 
 .chain-wrapper.pull {
@@ -212,4 +149,76 @@ body.active .lamp-glow {
     0% { transform: translateY(0); }
     50% { transform: translateY(14px); }
     100% { transform: translateY(0); }
+}
+
+/* Login Card Styled cleanly beside the lamp without overlapping */
+.login-card {
+    position: absolute;
+    right: 15px;
+    background: rgba(30, 28, 25, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 215, 0, 0.12);
+    padding: 30px 20px;
+    border-radius: 20px;
+    width: 190px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.9);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 10;
+}
+
+.login-card.active {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+}
+
+.login-card h2 {
+    margin-bottom: 20px;
+    font-weight: 600;
+    color: #fff;
+    font-size: 1.25rem;
+}
+
+.input-group {
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.input-group input:focus {
+    border-color: #ffd700;
+}
+
+.sign-in-btn {
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(135deg, #f3d56d, #d4af37);
+    border: none;
+    border-radius: 8px;
+    color: #1a1a1a;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+    transition: transform 0.1s;
+}
+
+.sign-in-btn:active {
+    transform: scale(0.98);
 }
