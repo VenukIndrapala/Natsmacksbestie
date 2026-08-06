@@ -11,7 +11,7 @@ chainToggle.addEventListener('click', () => {
         chainToggle.classList.remove('pull');
     }, 300);
 
-    // Toggle lighting mode and login form visibility with proper mobile spacing translation
+    // Toggle lighting state and card visibility smoothly
     body.classList.toggle('active');
     loginCard.classList.toggle('active');
 });
