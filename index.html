@@ -8,8 +8,23 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <!-- Login Card with Password Field Only -->
+    <div class="scene-wrapper">
+        <!-- Lamp Component -->
+        <div class="lamp-container">
+            <div class="lamp-head"></div>
+            <div class="lamp-stand-group">
+                <div class="lamp-stand"></div>
+                <!-- Pull Chain -->
+                <div class="chain-wrapper" id="chainToggle">
+                    <div class="chain-cord"></div>
+                    <div class="chain-ball"></div>
+                </div>
+            </div>
+            <div class="lamp-base"></div>
+            <div class="lamp-glow"></div>
+        </div>
+
+        <!-- Login Card -->
         <div class="login-card" id="loginCard">
             <h2>Welcome</h2>
             <form onsubmit="event.preventDefault();">
@@ -18,21 +33,6 @@
                 </div>
                 <button type="submit" class="sign-in-btn">Sign in</button>
             </form>
-        </div>
-
-        <!-- Lamp Component matching reference image -->
-        <div class="lamp-container">
-            <div class="lamp-head"></div>
-            <div class="lamp-stand-group">
-                <div class="lamp-stand"></div>
-                <!-- Pull Chain hanging from inside/under the lamp head -->
-                <div class="chain-wrapper" id="chainToggle">
-                    <div class="chain-cord"></div>
-                    <div class="chain-ball"></div>
-                </div>
-            </div>
-            <div class="lamp-base"></div>
-            <div class="lamp-glow"></div>
         </div>
     </div>
 
