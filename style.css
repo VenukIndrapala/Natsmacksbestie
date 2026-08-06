@@ -14,55 +14,56 @@ body {
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    transition: background-color 0.5s ease;
+    transition: background-color 0.6s ease;
 }
 
+/* Background shifts precisely to the warm golden-brown tone shown in the reference */
 body.active {
-    background-color: #24201c;
+    background-color: #27231e;
 }
 
-/* Flexible layout container handling mobile spacing & side-by-side positioning */
 .scene-wrapper {
     position: relative;
     width: 100%;
-    max-width: 420px;
+    max-width: 650px;
     height: 100%;
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
-    gap: 20px;
-    padding: 0 15px;
+    padding-left: 55px;
 }
 
-/* Lamp Setup with clean, realistic proportions */
+/* Lamp Container with absolute layout control for mobile */
 .lamp-container {
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     flex-shrink: 0;
-    transition: transform 0.4s ease;
+    transform: translateX(30px);
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 body.active .lamp-container {
-    transform: translateX(-65px);
+    transform: translateX(-40px);
 }
 
+/* Perfectly shaped dome lamp shade matching the reference visual */
 .lamp-head {
-    width: 130px;
-    height: 65px;
-    background-color: #eaeaea;
-    border-radius: 65px 65px 4px 4px;
+    width: 150px;
+    height: 75px;
+    background-color: #e4e2d9;
+    border-radius: 75px 75px 6px 6px;
     position: relative;
     z-index: 2;
-    box-shadow: inset 0 -5px 10px rgba(0,0,0,0.15);
-    transition: background-color 0.4s ease, box-shadow 0.4s ease;
+    box-shadow: inset 0 -8px 15px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.5s ease, box-shadow 0.5s ease;
 }
 
 body.active .lamp-head {
     background-color: #ffffff;
-    box-shadow: 0 15px 40px rgba(255, 220, 100, 0.6), inset 0 -5px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 15px 45px rgba(255, 215, 110, 0.75), inset 0 -6px 10px rgba(0,0,0,0.05);
 }
 
 .lamp-stand-group {
@@ -72,39 +73,40 @@ body.active .lamp-head {
 }
 
 .lamp-stand {
-    width: 6px;
-    height: 110px;
-    background-color: #eaeaea;
-    border-radius: 3px;
-    transition: background-color 0.4s ease;
+    width: 10px;
+    height: 140px;
+    background-color: #e4e2d9;
+    border-radius: 5px;
+    transition: background-color 0.5s ease;
 }
 
 body.active .lamp-stand {
-    background-color: #f5f5f5;
+    background-color: #f7f5ed;
 }
 
 .lamp-base {
-    width: 60px;
-    height: 6px;
-    background-color: #eaeaea;
-    border-radius: 3px;
-    transition: background-color 0.4s ease;
+    width: 85px;
+    height: 8px;
+    background-color: #e4e2d9;
+    border-radius: 4px;
+    transition: background-color 0.5s ease;
 }
 
 body.active .lamp-base {
-    background-color: #f5f5f5;
+    background-color: #f7f5ed;
 }
 
+/* Immersive lamp bloom / radial lighting glow */
 .lamp-glow {
     position: absolute;
-    top: 45px;
+    top: 50px;
     left: 50%;
     transform: translateX(-50%);
-    width: 220px;
-    height: 160px;
-    background: radial-gradient(circle, rgba(255,220,100,0.35) 0%, rgba(255,200,50,0) 75%);
+    width: 260px;
+    height: 180px;
+    background: radial-gradient(circle, rgba(255,215,100,0.4) 0%, rgba(255,180,30,0) 72%);
     opacity: 0;
-    transition: opacity 0.4s ease;
+    transition: opacity 0.5s ease;
     pointer-events: none;
     z-index: 1;
 }
@@ -117,7 +119,7 @@ body.active .lamp-glow {
 .chain-wrapper {
     position: absolute;
     top: 0;
-    left: 20px;
+    left: 24px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -129,16 +131,16 @@ body.active .lamp-glow {
 
 .chain-cord {
     width: 1.5px;
-    height: 45px;
-    background-color: #999;
+    height: 52px;
+    background-color: #888;
 }
 
 .chain-ball {
-    width: 10px;
-    height: 10px;
+    width: 11px;
+    height: 11px;
     background-color: #d4af37;
     border-radius: 50%;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
 }
 
 .chain-wrapper.pull {
@@ -147,58 +149,69 @@ body.active .lamp-glow {
 
 @keyframes pullChain {
     0% { transform: translateY(0); }
-    50% { transform: translateY(14px); }
+    50% { transform: translateY(16px); }
     100% { transform: translateY(0); }
 }
 
-/* Login Card Styled cleanly beside the lamp without overlapping */
+/* Glassmorphic Login Box positioned comfortably to the right without covering the lamp */
 .login-card {
     position: absolute;
-    right: 15px;
-    background: rgba(30, 28, 25, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 215, 0, 0.12);
-    padding: 30px 20px;
-    border-radius: 20px;
-    width: 190px;
-    text-align: center;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+    right: 25px;
+    background: rgba(30, 27, 24, 0.82);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 215, 0, 0.15);
+    padding: 32px 24px;
+    border-radius: 24px;
+    width: 245px;
+    text-align: left;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.75);
     opacity: 0;
     visibility: hidden;
-    transform: scale(0.9);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: scale(0.9) translateX(15px);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     z-index: 10;
 }
 
 .login-card.active {
     opacity: 1;
     visibility: visible;
-    transform: scale(1);
+    transform: scale(1) translateX(0);
 }
 
 .login-card h2 {
-    margin-bottom: 20px;
+    margin-bottom: 22px;
     font-weight: 600;
-    color: #fff;
-    font-size: 1.25rem;
+    color: #ffffff;
+    font-size: 1.35rem;
+    text-align: center;
 }
 
 .input-group {
     margin-bottom: 16px;
-    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.75rem;
+    color: #b3abab;
+    margin-bottom: 6px;
 }
 
 .input-group input {
     width: 100%;
-    padding: 10px 12px;
-    background: rgba(255, 255, 255, 0.04);
+    padding: 11px 14px;
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
+    border-radius: 10px;
     color: #fff;
     font-size: 0.9rem;
     outline: none;
     transition: border-color 0.3s;
+}
+
+.input-group input::placeholder {
+    color: #666;
 }
 
 .input-group input:focus {
@@ -207,15 +220,16 @@ body.active .lamp-glow {
 
 .sign-in-btn {
     width: 100%;
-    padding: 10px;
-    background: linear-gradient(135deg, #f3d56d, #d4af37);
+    margin-top: 6px;
+    padding: 12px;
+    background: linear-gradient(135deg, #f7df83, #d4af37);
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     color: #1a1a1a;
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.35);
     transition: transform 0.1s;
 }
 
