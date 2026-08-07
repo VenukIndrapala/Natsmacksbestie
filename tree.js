@@ -58,7 +58,7 @@ function startExactVideoReplication() {
         height = canvas.height = window.innerHeight;
     });
 
-    let state = 'FALLING_DOT'; 
+    let state = 'FALLING_HEART'; // Matches video starting with the heart falling down
     let dotY = height / 2 - 180;
     let groundY = height - 140;
     
@@ -73,55 +73,7 @@ function startExactVideoReplication() {
 
     const treeColor = "#ffb6c1";
 
-    // Draws a solid, tapered branch/trunk segment (wide at the start,
-    // narrower at the end) instead of a uniform-width stroked line, to
-    // match the filled, tapered look of the tree in the reference video.
-    function drawTaperedSegment(x1, y1, x2, y2, w1, w2, color) {
-        const dx = x2 - x1;
-        const dy = y2 - y1;
-        const len = Math.hypot(dx, dy);
-        if (len < 0.0001) return;
-        const nx = -dy / len;
-        const ny = dx / len;
-        const h1 = w1 / 2;
-        const h2 = w2 / 2;
-
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.moveTo(x1 + nx * h1, y1 + ny * h1);
-        ctx.lineTo(x2 + nx * h2, y2 + ny * h2);
-        // Rounded tip so branch ends look organic rather than cut flat.
-        ctx.arc(x2, y2, h2, Math.atan2(ny, nx), Math.atan2(-ny, -nx));
-        ctx.lineTo(x1 - nx * h1, y1 - ny * h1);
-        ctx.arc(x1, y1, h1, Math.atan2(-ny, -nx), Math.atan2(ny, nx));
-        ctx.closePath();
-        ctx.fill();
-    }
-
-    // Same idea as drawTaperedSegment but with flat (not rounded) ends --
-    // used for the trunk so its base sits flush with the ground line
-    // instead of showing a rounded notch.
-    function drawTaperedTrapezoid(x1, y1, x2, y2, w1, w2, color) {
-        const dx = x2 - x1;
-        const dy = y2 - y1;
-        const len = Math.hypot(dx, dy);
-        if (len < 0.0001) return;
-        const nx = -dy / len;
-        const ny = dx / len;
-        const h1 = w1 / 2;
-        const h2 = w2 / 2;
-
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.moveTo(x1 + nx * h1, y1 + ny * h1);
-        ctx.lineTo(x2 + nx * h2, y2 + ny * h2);
-        ctx.lineTo(x2 - nx * h2, y2 - ny * h2);
-        ctx.lineTo(x1 - nx * h1, y1 - ny * h1);
-        ctx.closePath();
-        ctx.fill();
-    }
-
-    // Helper to draw true geometric heart shapes matching the video
+    // Precise geometric heart shape matching the video style
     function drawHeartShape(x, y, size, color) {
         ctx.save();
         ctx.translate(x, y);
@@ -154,13 +106,12 @@ function startExactVideoReplication() {
         update() {
             if (this.progress < 1) {
                 this.progress += 0.04;
-            } else if (!this.hasChild && this.gen < 4) {
+            } else if (!this.hasChild && this.gen < 5) {
                 this.hasChild = true;
                 let endX = this.x + Math.cos(this.angle) * this.length;
                 let endY = this.y + Math.sin(this.angle) * this.length;
-                const spread = 0.35 + Math.random() * 0.15;
-                this.children.push(new Branch(endX, endY, this.length * 0.68, this.angle - spread, this.thickness * 0.62, this.gen + 1));
-                this.children.push(new Branch(endX, endY, this.length * 0.68, this.angle + spread, this.thickness * 0.62, this.gen + 1));
+                this.children.push(new Branch(endX, endY, this.length * 0.75, this.angle - 0.4, this.thickness * 0.7, this.gen + 1));
+                this.children.push(new Branch(endX, endY, this.length * 0.75, this.angle + 0.4, this.thickness * 0.7, this.gen + 1));
             }
             this.children.forEach(c => c.update());
         }
@@ -170,7 +121,13 @@ function startExactVideoReplication() {
             let endX = this.x + Math.cos(this.angle) * currentLen;
             let endY = this.y + Math.sin(this.angle) * currentLen;
 
-            drawTaperedSegment(this.x, this.y, endX, endY, this.thickness, this.thickness * 0.58, treeColor);
+            ctx.strokeStyle = treeColor;
+            ctx.lineWidth = this.thickness;
+            ctx.lineCap = "round";
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(endX, endY);
+            ctx.stroke();
 
             this.children.forEach(c => c.draw());
         }
@@ -196,7 +153,7 @@ function startExactVideoReplication() {
             this.cy = startY;
             this.progress = 0;
             this.speed = Math.random() * 0.035 + 0.025;
-            this.size = Math.random() * 4 + 7; // Heart sizing matching video canopy
+            this.size = Math.random() * 4 + 7;
             
             const hues = [340, 350, 15, 30, 45, 320];
             this.color = `hsl(${hues[Math.floor(Math.random() * hues.length)]}, 100%, 70%)`;
@@ -215,7 +172,6 @@ function startExactVideoReplication() {
         }
     }
 
-    // Interactive Falling Heart Class triggered when clicking the tree/hearts
     class FallingHeart {
         constructor(x, y, color) {
             this.x = x;
@@ -231,7 +187,7 @@ function startExactVideoReplication() {
         update() {
             this.x += this.vx;
             this.y += this.vy;
-            this.vy += 0.15; // Gravity acceleration
+            this.vy += 0.15;
             this.rotation += this.vRot;
         }
 
@@ -256,13 +212,11 @@ function startExactVideoReplication() {
         });
     }
 
-    // Click canvas listener to make hearts detach and fall down like in the reference video
     canvas.addEventListener('click', (e) => {
         const rect = canvas.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
         const clickY = e.clientY - rect.top;
 
-        // Spawn a cascade of falling hearts from the canopy on click
         for (let i = 0; i < 15; i++) {
             let sourceHeart = hearts.length > 0 ? hearts[Math.floor(Math.random() * hearts.length)] : {cx: clickX, cy: clickY, color: '#ffb6c1'};
             interactiveFallingHearts.push(new FallingHeart(sourceHeart.cx, sourceHeart.cy, sourceHeart.color));
@@ -270,24 +224,23 @@ function startExactVideoReplication() {
     });
 
     function animate() {
-        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+        ctx.fillRect(0, 0, width, height);
 
-        // Ground baseline (spans most of the screen width, matching the video)
-        const groundMargin = width * 0.08;
+        // Ground baseline
         ctx.strokeStyle = "#ffffff";
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(groundMargin, groundY);
-        ctx.lineTo(width - groundMargin, groundY);
+        ctx.moveTo(width / 2 - 320, groundY);
+        ctx.lineTo(width / 2 + 320, groundY);
         ctx.stroke();
 
-        if (state === 'FALLING_DOT') {
-            ctx.fillStyle = "#ffb6c1";
+        if (state === 'FALLING_HEART') {
+            // Render the falling heart matching the reference video beginning
+            drawHeartShape(width / 2, dotY, 12, "#ffb6c1");
             ctx.shadowBlur = 15;
             ctx.shadowColor = "#ffb6c1";
-            ctx.beginPath();
-            ctx.arc(width / 2, dotY, 6, 0, Math.PI * 2);
-            ctx.fill();
+            drawHeartShape(width / 2, dotY, 12, "#ffb6c1");
             ctx.shadowBlur = 0;
 
             dotY += 7;
@@ -300,13 +253,25 @@ function startExactVideoReplication() {
                 trunkHeight += 4;
             } else {
                 state = 'BRANCHING';
-                rootBranch = new Branch(width / 2, groundY - targetTrunkHeight, 78, -Math.PI / 2, trunkWidth, 1);
+                rootBranch = new Branch(width / 2, groundY - targetTrunkHeight, 95, -Math.PI / 2, trunkWidth, 1);
             }
 
-            drawTaperedTrapezoid(width / 2, groundY, width / 2, groundY - trunkHeight, trunkWidth * 1.8, trunkWidth * 0.9, treeColor);
+            ctx.strokeStyle = treeColor;
+            ctx.lineWidth = trunkWidth;
+            ctx.lineCap = "round";
+            ctx.beginPath();
+            ctx.moveTo(width / 2, groundY);
+            ctx.lineTo(width / 2, groundY - trunkHeight);
+            ctx.stroke();
         } 
         else if (state === 'BRANCHING') {
-            drawTaperedTrapezoid(width / 2, groundY, width / 2, groundY - targetTrunkHeight, trunkWidth * 1.8, trunkWidth * 0.9, treeColor);
+            ctx.strokeStyle = treeColor;
+            ctx.lineWidth = trunkWidth;
+            ctx.lineCap = "round";
+            ctx.beginPath();
+            ctx.moveTo(width / 2, groundY);
+            ctx.lineTo(width / 2, groundY - targetTrunkHeight);
+            ctx.stroke();
 
             rootBranch.update();
             rootBranch.draw();
@@ -327,7 +292,6 @@ function startExactVideoReplication() {
                 h.draw();
             });
 
-            // Update & render interactive falling hearts
             interactiveFallingHearts.forEach((fh, index) => {
                 fh.update();
                 fh.draw();
@@ -341,7 +305,6 @@ function startExactVideoReplication() {
     }
     animate();
 
-    // Typewriter text progression sequence matching video timing
     const loveMessage = document.getElementById('loveMessage');
     const messages = [
         "hey you :)",
