@@ -1,21 +1,11 @@
 <!-- index.html -->
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>HBD love</title>
-    <link type="text/css" rel="stylesheet" href="file/default.css">
-    <link type="text/css" rel="stylesheet" href="style.css">
-    <script type="text/javascript" src="file/jquery.min.js"></script>
-    <script type="text/javascript" src="file/jscex.min.js"></script>
-    <script type="text/javascript" src="file/jscex-parser.js"></script>
-    <script type="text/javascript" src="file/jscex-jit.js"></script>
-    <script type="text/javascript" src="file/jscex-builderbase.min.js"></script>
-    <script type="text/javascript" src="file/jscex-async.min.js"></script>
-    <script type="text/javascript" src="file/jscex-async-powerpack.min.js"></script>
-    <script type="text/javascript" src="file/function.js" charset="utf-8"></script>
-    <script type="text/javascript" src="file/love.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <!-- Initial Lamp Page View -->
@@ -51,37 +41,12 @@
         </div>
     </div>
 
-    <!-- The Tree Animation Scene matching the referenced video structure -->
-    <div id="main">
-        <div id="error">
-            <a href="http://www.google.cn/chrome/intl/zh-CN/landing_chrome.html?hl=zh-CN&brand=CHMI">Chrome</a> 
-            (<a href="http://firefox.com.cn/download/">Firefox</a>)
-        </div>
-        <div id="wrap">
-            <div id="text">
-                <div id="code">
-                    <span class="say">Hey, you :)</span><br>
-                    <span class="say"> </span><br>
-                    <span class="say">Happy Birthday !</span><br>
-                    <span class="say"> </span><br>
-                    <span class="say">May God bless you.</span><br>
-                    <span class="say"> </span><br>
-                    <span class="say">And give you many happiness :)</span><br>
-                    <span class="say"> </span><br>
-                    <span class="say">Always keep smiling...</span><br>
-                    <span class="say"> </span><br>
-                    <span class="say">-- Yours truly, forever.</span><br>
-                </div>
-            </div>
-            <div id="clock-box">
-                <span class="STYLE1"></span><font color="#33CC00"></font>
-                <span class="STYLE1"></span>
-                <div id="clock"></div>
-            </div>
-            <canvas id="canvas" width="1100" height="680"></canvas>
-        </div>
-        <audio autoplay="autoplay" height="100" width="100" id="myAudio">
-            <source src="aud.mp3" type="audio/mp3" />
+    <!-- Tree and Heart Canvas Animation Scene matching the exact reference video -->
+    <div class="video-animation-scene" id="videoAnimationScene">
+        <canvas id="treeCanvas"></canvas>
+        <div class="love-message" id="loveMessage"></div>
+        <audio id="myAudio" loop>
+            <source src="aud.mp3" type="audio/mp3">
         </audio>
     </div>
 
