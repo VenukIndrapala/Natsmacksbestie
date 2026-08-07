@@ -3,7 +3,7 @@ const chainToggle = document.getElementById('chainToggle');
 const loginCard = document.getElementById('loginCard');
 const body = document.body;
 const lampScene = document.getElementById('lampScene');
-const mainScene = document.getElementById('mainScene');
+const mainScene = document.getElementById('main');
 const loginForm = document.getElementById('loginForm');
 const passwordInput = document.getElementById('passwordInput');
 const audioElement = document.getElementById('myAudio');
@@ -22,23 +22,30 @@ chainToggle.addEventListener('click', () => {
     loginCard.classList.toggle('active');
 });
 
-// Password submission and transition to the authentic tree animation scene
+// Password submission, hiding the lamp view, and initializing the original tree animation framework
 loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
     if (passwordInput.value === CORRECT_PASSWORD) {
         lampScene.classList.add('hidden');
         body.classList.remove('active');
         body.style.backgroundColor = "#ffe4e1";
-        mainScene.classList.add('active');
+        mainScene.style.display = "block";
 
-        // Play audio as implemented in the reference code snippet
+        // Play audio element
         if (audioElement) {
             audioElement.play().catch(err => console.log("Audio autoplay restricted:", err));
         }
 
-        // Trigger the external tree and heart JS animation framework if loaded
-        if (typeof startTreeAnimation === 'function') {
-            startTreeAnimation();
+        // Execute the original Jscex and love.js animation logic once loaded
+        if (typeof startLoveAnimation === 'function') {
+            startLoveAnimation();
+        } else if (window.eval && typeof eval === 'function') {
+            // Fallback trigger if love.js uses standard document ready auto-execution structure
+            $(document).ready(function() {
+                if (typeof $().code === 'function' || window.tree) {
+                    // Framework handles itself on DOM ready, ensuring visibility triggers execution
+                }
+            });
         }
     } else {
         alert("Incorrect password! Try again.");
