@@ -70,7 +70,6 @@ function startExactTreeGrowth(btnX, btnY) {
     
     let targetGroundX = width / 2;
     let groundY = height - 120;
-    // Adjusted color to match the warmer brown of the target
     const trunkColor = "#864B24"; 
 
     class CubicBranch {
@@ -123,37 +122,35 @@ function startExactTreeGrowth(btnX, btnY) {
     let branches = [];
 
     function setupBranches() {
-        // Re-calibrated coordinates and widths to taper down to almost 0 for maximum sharpness.
-        
-        // Main Trunk
-        branches.push(new CubicBranch(0, 0, -3, -40, -5, -80, -2, -110, 24, 11, 0));
+        // EXACT TOPOLOGY OF THE CIRCLED TREE
+        // Straighter curves, correct branch counts, angular positioning
 
-        // Right lower sweeping branch
-        branches.push(new CubicBranch(0, -25, 45, -30, 85, -45, 120, -75, 7, 0.1, 15));
+        // 1. Main Trunk (Perfectly straight up)
+        branches.push(new CubicBranch(0, 0, 0, -40, 0, -80, 0, -115, 23, 10, 0));
 
-        // Left lower sweeping branch
-        branches.push(new CubicBranch(-2, -50, -45, -50, -85, -60, -120, -90, 6, 0.1, 30));
+        // 2. Lower Right Branch (Starts flat, slightly curves up at the end)
+        branches.push(new CubicBranch(0, -40, 40, -45, 80, -60, 120, -80, 7, 0.1, 15));
 
-        // Right middle branch
-        branches.push(new CubicBranch(-2, -75, 30, -85, 65, -100, 95, -125, 5, 0.1, 45));
+        // 3. Lower Left Branch (Starts flat, slightly curves up at the end)
+        branches.push(new CubicBranch(0, -50, -40, -55, -80, -65, -120, -85, 7, 0.1, 20));
 
-        // Left Main Split
-        branches.push(new CubicBranch(-2, -108, -25, -150, -45, -180, -70, -215, 11, 0.4, 65));
+        // 4. Middle Right Branch (Steeper diagonal)
+        branches.push(new CubicBranch(0, -75, 30, -95, 65, -115, 95, -135, 5.5, 0.1, 35));
 
-        // Right Main Split
-        branches.push(new CubicBranch(-2, -108, 15, -150, 25, -190, 45, -225, 11, 0.4, 65));
+        // 5. Middle Left Branch (Steeper diagonal)
+        branches.push(new CubicBranch(0, -85, -30, -105, -65, -125, -95, -140, 5.5, 0.1, 40));
 
-        // Outer Left Sub-branch
-        branches.push(new CubicBranch(-32, -165, -55, -168, -85, -172, -105, -185, 4.5, 0.1, 90));
+        // 6. Top Right V-Split (Mostly vertical)
+        branches.push(new CubicBranch(0, -112, 15, -150, 25, -185, 35, -220, 9, 0.1, 55));
 
-        // Inner Left Sub-branch
-        branches.push(new CubicBranch(-45, -180, -45, -210, -40, -230, -35, -260, 3.5, 0.1, 110));
+        // 7. Top Left V-Split (Mostly vertical)
+        branches.push(new CubicBranch(0, -112, -10, -150, -20, -180, -30, -215, 9, 0.1, 55));
 
-        // Outer Right Sub-branch
-        branches.push(new CubicBranch(15, -155, 45, -160, 70, -170, 95, -185, 4.5, 0.1, 90));
+        // 8. Outer Sub-branch off Top Right
+        branches.push(new CubicBranch(16, -155, 35, -165, 55, -180, 75, -195, 3.5, 0.1, 75));
 
-        // Inner Right Sub-branch
-        branches.push(new CubicBranch(25, -190, 20, -215, 15, -240, 10, -270, 3.5, 0.1, 110));
+        // 9. Outer Sub-branch off Top Left
+        branches.push(new CubicBranch(-13, -150, -30, -160, -50, -175, -65, -190, 3.5, 0.1, 75));
     }
 
     function drawDot(x, y, radius, color) {
