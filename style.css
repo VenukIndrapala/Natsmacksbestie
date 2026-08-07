@@ -248,14 +248,14 @@ body.active .lamp-glow {
     transform: scale(0.98);
 }
 
-/* Video Animation Scene Styles */
+/* Video Replica Scene Styles */
 .video-animation-scene {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: #fce4ec; /* Matches the soft pink background theme in the video */
+    background-color: #000000;
     display: none;
     justify-content: center;
     align-items: center;
@@ -266,7 +266,7 @@ body.active .lamp-glow {
     display: flex;
 }
 
-/* Click Me Prompt Styling */
+/* Click Me Prompt Styling matching video start */
 .click-prompt {
     position: absolute;
     top: 40%;
@@ -275,12 +275,12 @@ body.active .lamp-glow {
     display: flex;
     align-items: center;
     gap: 12px;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(233, 30, 99, 0.3);
+    background: rgba(20, 20, 20, 0.85);
+    border: 1px solid rgba(255, 182, 193, 0.3);
     padding: 12px 22px;
     border-radius: 30px;
     cursor: pointer;
-    box-shadow: 0 0 25px rgba(233, 30, 99, 0.15);
+    box-shadow: 0 0 25px rgba(255, 182, 193, 0.25);
     z-index: 120;
     transition: transform 0.2s ease, opacity 0.5s ease;
     animation: promptFloat 2s ease-in-out infinite;
@@ -291,7 +291,7 @@ body.active .lamp-glow {
 }
 
 .click-prompt span {
-    color: #c2185b;
+    color: #ffb6c1;
     font-size: 0.9rem;
     font-weight: 600;
     line-height: 1.2;
@@ -299,14 +299,14 @@ body.active .lamp-glow {
 
 .click-prompt small {
     font-size: 0.7rem;
-    color: #d81b60;
+    color: #e0a8b0;
     font-weight: 400;
 }
 
 .pulse-heart {
     width: 20px;
     height: 20px;
-    background-color: #e91e63;
+    background-color: #ffb6c1;
     transform: rotate(45deg);
     position: relative;
     animation: heartBeat 1.2s infinite;
@@ -317,7 +317,7 @@ body.active .lamp-glow {
     content: '';
     width: 20px;
     height: 20px;
-    background-color: #e91e63;
+    background-color: #ffb6c1;
     border-radius: 50%;
     position: absolute;
 }
@@ -354,14 +354,14 @@ body.active .lamp-glow {
 .love-message {
     position: absolute;
     top: 15%;
-    left: 10%;
-    color: #c2185b;
-    font-size: 0.95rem;
+    left: 12%;
+    color: #ffb6c1;
+    font-size: 0.85rem;
     text-align: left;
+    text-shadow: 0 0 8px rgba(255, 182, 193, 0.5);
     pointer-events: none;
     z-index: 101;
     line-height: 1.6;
     opacity: 0;
     transition: opacity 0.6s ease;
-    font-weight: 500;
 }
