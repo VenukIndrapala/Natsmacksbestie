@@ -1,11 +1,21 @@
 <!-- index.html -->
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>HBD love</title>
+    <link type="text/css" rel="stylesheet" href="file/default.css">
     <link type="text/css" rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="file/jquery.min.js"></script>
+    <script type="text/javascript" src="file/jscex.min.js"></script>
+    <script type="text/javascript" src="file/jscex-parser.js"></script>
+    <script type="text/javascript" src="file/jscex-jit.js"></script>
+    <script type="text/javascript" src="file/jscex-builderbase.min.js"></script>
+    <script type="text/javascript" src="file/jscex-async.min.js"></script>
+    <script type="text/javascript" src="file/jscex-async-powerpack.min.js"></script>
+    <script type="text/javascript" src="file/function.js" charset="utf-8"></script>
+    <script type="text/javascript" src="file/love.js" charset="utf-8"></script>
 </head>
 <body>
     <!-- Initial Lamp Page View -->
@@ -41,8 +51,8 @@
         </div>
     </div>
 
-    <!-- The Tree & Heart Animation Scene matching the reference code structure -->
-    <div class="main-scene" id="mainScene">
+    <!-- The Tree Animation Scene matching the referenced video structure -->
+    <div id="main">
         <div id="error">
             <a href="http://www.google.cn/chrome/intl/zh-CN/landing_chrome.html?hl=zh-CN&brand=CHMI">Chrome</a> 
             (<a href="http://firefox.com.cn/download/">Firefox</a>)
@@ -74,17 +84,6 @@
             <source src="aud.mp3" type="audio/mp3" />
         </audio>
     </div>
-
-    <!-- External Script Dependencies matching the reference code -->
-    <script src="file/jquery.min.js"></script>
-    <script src="file/jscex.min.js"></script>
-    <script src="file/jscex-parser.js"></script>
-    <script src="file/jscex-jit.js"></script>
-    <script src="file/jscex-builderbase.min.js"></script>
-    <script src="file/jscex-async.min.js"></script>
-    <script src="file/jscex-async-powerpack.min.js"></script>
-    <script src="file/function.js" charset="utf-8"></script>
-    <script src="file/love.js" charset="utf-8"></script>
 
     <script src="tree.js"></script>
 </body>
