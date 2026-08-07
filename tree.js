@@ -1,3 +1,4 @@
+/* tree.js */
 const chainToggle = document.getElementById('chainToggle');
 const loginCard = document.getElementById('loginCard');
 const body = document.body;
@@ -10,7 +11,6 @@ const clickPrompt = document.getElementById('clickPrompt');
 
 const CORRECT_PASSWORD = "123";
 
-// --- Authentication and Transition Logic ---
 chainToggle.addEventListener('click', () => {
     chainToggle.classList.add('pull');
     setTimeout(() => {
@@ -26,7 +26,7 @@ loginForm.addEventListener('submit', (e) => {
     if (passwordInput.value === CORRECT_PASSWORD) {
         lampScene.classList.add('hidden');
         body.classList.remove('active');
-        body.style.backgroundColor = "#fce1e6";
+        body.style.backgroundColor = "#000";
         videoAnimationScene.classList.add('active');
 
         if (audioElement) {
@@ -38,20 +38,15 @@ loginForm.addEventListener('submit', (e) => {
     }
 });
 
-clickPrompt.addEventListener('click', (e) => {
-    const rect = clickPrompt.getBoundingClientRect();
-    const startX = rect.left + rect.width / 2;
-    const startY = rect.top + rect.height / 2;
-
+clickPrompt.addEventListener('click', () => {
     clickPrompt.style.opacity = '0';
     setTimeout(() => {
         clickPrompt.style.display = 'none';
-        startExactTreeGrowth(startX, startY);
-    }, 400);
+        startExactVideoReplication();
+    }, 500);
 });
 
-// --- Final Replicated Tree Animation Logic ---
-function startExactTreeGrowth(btnX, btnY) {
+function startExactVideoReplication() {
     const canvas = document.getElementById('treeCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -63,139 +58,308 @@ function startExactTreeGrowth(btnX, btnY) {
         height = canvas.height = window.innerHeight;
     });
 
-    let state = 'FALLING_DOT';
+    let state = 'FALLING_DOT'; 
+    let dotY = height / 2 - 180;
+    let groundY = height - 140;
     
-    let dotX = btnX;
-    let dotY = btnY;
-    
-    let targetGroundX = width / 2;
-    let groundY = height - 120;
-    const trunkColor = "#864B24"; 
+    let trunkHeight = 0;
+    let targetTrunkHeight = 130;
+    let trunkWidth = 14;
 
-    class CubicBranch {
-        constructor(sx, sy, cp1x, cp1y, cp2x, cp2y, ex, ey, w0, w1, delay) {
-            const scale = 1.35; 
-            
-            this.p0 = { x: sx * scale, y: sy * scale };
-            this.p1 = { x: cp1x * scale, y: cp1y * scale };
-            this.p2 = { x: cp2x * scale, y: cp2y * scale };
-            this.p3 = { x: ex * scale, y: ey * scale };
-            this.w0 = w0 * scale;
-            this.w1 = w1 * scale;
-            this.delay = delay;
+    let rootBranch = null;
+    let hearts = [];
+    let heartSpawned = false;
+    let interactiveFallingHearts = [];
+
+    const treeColor = "#ffb6c1";
+
+    // Draws a solid, tapered branch/trunk segment (wide at the start,
+    // narrower at the end) instead of a uniform-width stroked line, to
+    // match the filled, tapered look of the tree in the reference video.
+    function drawTaperedSegment(x1, y1, x2, y2, w1, w2, color) {
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const len = Math.hypot(dx, dy);
+        if (len < 0.0001) return;
+        const nx = -dy / len;
+        const ny = dx / len;
+        const h1 = w1 / 2;
+        const h2 = w2 / 2;
+
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(x1 + nx * h1, y1 + ny * h1);
+        ctx.lineTo(x2 + nx * h2, y2 + ny * h2);
+        // Rounded tip so branch ends look organic rather than cut flat.
+        ctx.arc(x2, y2, h2, Math.atan2(ny, nx), Math.atan2(-ny, -nx));
+        ctx.lineTo(x1 - nx * h1, y1 - ny * h1);
+        ctx.arc(x1, y1, h1, Math.atan2(-ny, -nx), Math.atan2(ny, nx));
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    // Same idea as drawTaperedSegment but with flat (not rounded) ends --
+    // used for the trunk so its base sits flush with the ground line
+    // instead of showing a rounded notch.
+    function drawTaperedTrapezoid(x1, y1, x2, y2, w1, w2, color) {
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const len = Math.hypot(dx, dy);
+        if (len < 0.0001) return;
+        const nx = -dy / len;
+        const ny = dx / len;
+        const h1 = w1 / 2;
+        const h2 = w2 / 2;
+
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(x1 + nx * h1, y1 + ny * h1);
+        ctx.lineTo(x2 + nx * h2, y2 + ny * h2);
+        ctx.lineTo(x2 - nx * h2, y2 - ny * h2);
+        ctx.lineTo(x1 - nx * h1, y1 - ny * h1);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    // Helper to draw true geometric heart shapes matching the video
+    function drawHeartShape(x, y, size, color) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(size / 12, size / 12);
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(0, 3);
+        ctx.bezierCurveTo(-5, -3, -12, 2, -6, 9);
+        ctx.bezierCurveTo(-3, 12, 0, 14, 0, 15);
+        ctx.bezierCurveTo(0, 14, 3, 12, 6, 9);
+        ctx.bezierCurveTo(12, 2, 5, -3, 0, 3);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+    }
+
+    class Branch {
+        constructor(x, y, length, angle, thickness, gen) {
+            this.x = x;
+            this.y = y;
+            this.length = length;
+            this.angle = angle;
+            this.thickness = thickness;
+            this.gen = gen;
             this.progress = 0;
-            this.speed = 0.012; 
+            this.children = [];
+            this.hasChild = false;
         }
 
         update() {
-            if (this.delay > 0) {
-                this.delay--;
-                return;
+            if (this.progress < 1) {
+                this.progress += 0.04;
+            } else if (!this.hasChild && this.gen < 4) {
+                this.hasChild = true;
+                let endX = this.x + Math.cos(this.angle) * this.length;
+                let endY = this.y + Math.sin(this.angle) * this.length;
+                const spread = 0.35 + Math.random() * 0.15;
+                this.children.push(new Branch(endX, endY, this.length * 0.68, this.angle - spread, this.thickness * 0.62, this.gen + 1));
+                this.children.push(new Branch(endX, endY, this.length * 0.68, this.angle + spread, this.thickness * 0.62, this.gen + 1));
             }
+            this.children.forEach(c => c.update());
+        }
+
+        draw() {
+            let currentLen = this.length * Math.min(this.progress, 1);
+            let endX = this.x + Math.cos(this.angle) * currentLen;
+            let endY = this.y + Math.sin(this.angle) * currentLen;
+
+            drawTaperedSegment(this.x, this.y, endX, endY, this.thickness, this.thickness * 0.58, treeColor);
+
+            this.children.forEach(c => c.draw());
+        }
+
+        getTerminals(list) {
+            let endX = this.x + Math.cos(this.angle) * this.length;
+            let endY = this.y + Math.sin(this.angle) * this.length;
+            if (this.children.length === 0) {
+                list.push({ x: endX, y: endY });
+            } else {
+                this.children.forEach(c => c.getTerminals(list));
+            }
+        }
+    }
+
+    class TreeHeart {
+        constructor(startX, startY, targetX, targetY) {
+            this.x = startX;
+            this.y = startY;
+            this.tx = targetX;
+            this.ty = targetY;
+            this.cx = startX;
+            this.cy = startY;
+            this.progress = 0;
+            this.speed = Math.random() * 0.035 + 0.025;
+            this.size = Math.random() * 4 + 7; // Heart sizing matching video canopy
+            
+            const hues = [340, 350, 15, 30, 45, 320];
+            this.color = `hsl(${hues[Math.floor(Math.random() * hues.length)]}, 100%, 70%)`;
+        }
+
+        update() {
             if (this.progress < 1) {
                 this.progress += this.speed;
-                if (this.progress > 1) this.progress = 1;
+                this.cx += (this.tx - this.cx) * 0.12;
+                this.cy += (this.ty - this.cy) * 0.12;
             }
         }
 
-        draw(ctx, offsetX, offsetY) {
-            if (this.progress <= 0) return;
-            
-            let steps = Math.floor(300 * this.progress); 
-            ctx.fillStyle = trunkColor;
-            
-            for (let i = 0; i <= steps; i++) {
-                let t = i / 300;
-                let invT = 1 - t;
-                
-                let x = invT*invT*invT*this.p0.x + 3*invT*invT*t*this.p1.x + 3*invT*t*t*this.p2.x + t*t*t*this.p3.x;
-                let y = invT*invT*invT*this.p0.y + 3*invT*invT*t*this.p1.y + 3*invT*t*t*this.p2.y + t*t*t*this.p3.y;
-                let w = this.w0 - (this.w0 - this.w1) * t;
-                
-                ctx.beginPath();
-                ctx.arc(offsetX + x, offsetY + y, w / 2, 0, Math.PI * 2);
-                ctx.fill();
-            }
+        draw() {
+            drawHeartShape(this.cx, this.cy, this.size, this.color);
         }
     }
 
-    let branches = [];
+    // Interactive Falling Heart Class triggered when clicking the tree/hearts
+    class FallingHeart {
+        constructor(x, y, color) {
+            this.x = x;
+            this.y = y;
+            this.vx = (Math.random() - 0.5) * 3;
+            this.vy = Math.random() * 2 + 2;
+            this.size = 11;
+            this.color = color;
+            this.rotation = Math.random() * Math.PI;
+            this.vRot = (Math.random() - 0.5) * 0.05;
+        }
 
-    function setupBranches() {
-        // EXACT TOPOLOGY MATCHING image_f599f3.png
-        
-        // 1. Main Trunk (Slight organic lean matching the image)
-        branches.push(new CubicBranch(0, 0, 2, -50, 4, -100, 3, -155, 24, 9, 0));
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.vy += 0.15; // Gravity acceleration
+            this.rotation += this.vRot;
+        }
 
-        // 2. Lower Left Branch (The prominent single branch shooting left)
-        branches.push(new CubicBranch(-1, -75, -45, -85, -85, -100, -118, -118, 6.5, 0.1, 15));
-
-        // 3. Middle Right Branch (Lower-mid right branch)
-        branches.push(new CubicBranch(1, -110, 40, -120, 75, -135, 105, -150, 5, 0.1, 30));
-
-        // 4. Upper-Middle Left Branch (Split higher up on the left side)
-        branches.push(new CubicBranch(2, -130, -30, -145, -60, -165, -85, -185, 4.5, 0.1, 45));
-
-        // 5. Main Top Right Primary Fork
-        branches.push(new CubicBranch(3, -155, 20, -190, 35, -225, 50, -260, 8.5, 0.1, 60));
-
-        // 6. Main Top Left Primary Fork
-        branches.push(new CubicBranch(3, -155, -12, -185, -22, -215, -35, -250, 8.5, 0.1, 60));
-
-        // 7. Tiny Sub-branch sprouting off Upper-Right Fork
-        branches.push(new CubicBranch(35, -210, 50, -220, 68, -230, 80, -240, 3.2, 0.1, 80));
-
-        // 8. Tiny Sub-branch sprouting off Upper-Left Fork
-        branches.push(new CubicBranch(-15, -195, -32, -205, -50, -215, -62, -225, 3.2, 0.1, 80));
+        draw() {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.rotation);
+            drawHeartShape(0, 0, this.size, this.color);
+            ctx.restore();
+        }
     }
 
-    function drawDot(x, y, radius, color) {
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.fill();
+    let heartTargets = [];
+    for (let i = 0; i < 450; i++) {
+        let t = (i / 450) * Math.PI * 2;
+        let x = 16 * Math.pow(Math.sin(t), 3);
+        let y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+        let fillFactor = Math.random();
+        heartTargets.push({
+            x: width / 2 + x * 11 * Math.sqrt(fillFactor),
+            y: (groundY - targetTrunkHeight - 110) + y * 11 * Math.sqrt(fillFactor)
+        });
     }
+
+    // Click canvas listener to make hearts detach and fall down like in the reference video
+    canvas.addEventListener('click', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+
+        // Spawn a cascade of falling hearts from the canopy on click
+        for (let i = 0; i < 15; i++) {
+            let sourceHeart = hearts.length > 0 ? hearts[Math.floor(Math.random() * hearts.length)] : {cx: clickX, cy: clickY, color: '#ffb6c1'};
+            interactiveFallingHearts.push(new FallingHeart(sourceHeart.cx, sourceHeart.cy, sourceHeart.color));
+        }
+    });
 
     function animate() {
         ctx.clearRect(0, 0, width, height);
 
-        // Ground line
-        ctx.strokeStyle = "#1a1a1a";
+        // Ground baseline (spans most of the screen width, matching the video)
+        const groundMargin = width * 0.08;
+        ctx.strokeStyle = "#ffffff";
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(0, groundY);
-        ctx.lineTo(width, groundY);
+        ctx.moveTo(groundMargin, groundY);
+        ctx.lineTo(width - groundMargin, groundY);
         ctx.stroke();
 
         if (state === 'FALLING_DOT') {
-            ctx.shadowBlur = 12;
-            ctx.shadowColor = "#e91e63";
-            drawDot(dotX, dotY, 6, "#e91e63");
+            ctx.fillStyle = "#ffb6c1";
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = "#ffb6c1";
+            ctx.beginPath();
+            ctx.arc(width / 2, dotY, 6, 0, Math.PI * 2);
+            ctx.fill();
             ctx.shadowBlur = 0;
 
-            dotY += 12; 
-            dotX += (targetGroundX - dotX) * 0.1; 
-
+            dotY += 7;
             if (dotY >= groundY) {
-                state = 'GROWING_TREE';
-                setupBranches(); 
+                state = 'GROWING_TRUNK';
             }
         } 
-        else if (state === 'GROWING_TREE') {
-            ctx.save();
-            ctx.beginPath();
-            ctx.rect(0, 0, width, groundY - 1); 
-            ctx.clip();
+        else if (state === 'GROWING_TRUNK') {
+            if (trunkHeight < targetTrunkHeight) {
+                trunkHeight += 4;
+            } else {
+                state = 'BRANCHING';
+                rootBranch = new Branch(width / 2, groundY - targetTrunkHeight, 78, -Math.PI / 2, trunkWidth, 1);
+            }
 
-            branches.forEach(branch => {
-                branch.update();
-                branch.draw(ctx, targetGroundX, groundY);
+            drawTaperedTrapezoid(width / 2, groundY, width / 2, groundY - trunkHeight, trunkWidth * 1.8, trunkWidth * 0.9, treeColor);
+        } 
+        else if (state === 'BRANCHING') {
+            drawTaperedTrapezoid(width / 2, groundY, width / 2, groundY - targetTrunkHeight, trunkWidth * 1.8, trunkWidth * 0.9, treeColor);
+
+            rootBranch.update();
+            rootBranch.draw();
+
+            if (rootBranch.progress >= 1 && rootBranch.children.length > 0 && !heartSpawned) {
+                heartSpawned = true;
+                let terminals = [];
+                rootBranch.getTerminals(terminals);
+
+                heartTargets.forEach(target => {
+                    let src = terminals.length > 0 ? terminals[Math.floor(Math.random() * terminals.length)] : { x: width / 2, y: groundY - targetTrunkHeight };
+                    hearts.push(new TreeHeart(src.x, src.y, target.x, target.y));
+                });
+            }
+
+            hearts.forEach(h => {
+                h.update();
+                h.draw();
             });
 
-            ctx.restore();
+            // Update & render interactive falling hearts
+            interactiveFallingHearts.forEach((fh, index) => {
+                fh.update();
+                fh.draw();
+                if (fh.y > height + 50) {
+                    interactiveFallingHearts.splice(index, 1);
+                }
+            });
         }
 
         requestAnimationFrame(animate);
     }
     animate();
+
+    // Typewriter text progression sequence matching video timing
+    const loveMessage = document.getElementById('loveMessage');
+    const messages = [
+        "hey you :)",
+        "hey you :)<br>Happy Birthday !",
+        "hey you :)<br>Happy Birthday !<br>May God bless you",
+        "hey you :)<br>Happy Birthday !<br>May God bless you ✨<br>And give u many happiness ✨",
+        "hey you :)<br>Happy Birthday !<br>May God bless you ✨<br>And give u many happiness ✨<br>Just saying... you're pretty awesome ✨",
+        "hey you :)<br>Happy Birthday !<br>May God bless you ✨<br>And give u many happiness ✨<br>Just saying... you're pretty awesome ✨<br>sending good vibes<br>and maybe a kiss... ♡"
+    ];
+
+    let msgIndex = 0;
+    function showMessages() {
+        if (msgIndex < messages.length) {
+            loveMessage.innerHTML = messages[msgIndex];
+            loveMessage.style.opacity = 1;
+            msgIndex++;
+            setTimeout(showMessages, 3800);
+        }
+    }
+    setTimeout(showMessages, 3000);
 }
