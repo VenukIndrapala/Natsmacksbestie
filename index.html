@@ -10,7 +10,6 @@
 <body>
     <!-- Initial Lamp Page View -->
     <div class="scene-wrapper" id="lampScene">
-        <!-- Lamp Component (Locked & Unchanged) -->
         <div class="lamp-container">
             <div class="lamp-shade-shadow"></div>
             <div class="lamp-head">
@@ -18,7 +17,6 @@
             </div>
             <div class="lamp-stand-group">
                 <div class="lamp-stand"></div>
-                <!-- Pull Chain -->
                 <div class="chain-wrapper" id="chainToggle">
                     <div class="chain-cord"></div>
                     <div class="chain-ball"></div>
@@ -28,7 +26,6 @@
             <div class="lamp-glow"></div>
         </div>
 
-        <!-- Login Card -->
         <div class="login-card" id="loginCard">
             <h2>Welcome</h2>
             <form id="loginForm">
@@ -41,8 +38,14 @@
         </div>
     </div>
 
-    <!-- Tree and Heart Canvas Animation Scene -->
+    <!-- Exact Replicated Video Animation Scene -->
     <div class="video-animation-scene" id="videoAnimationScene">
+        <!-- Interactive Click Me Heart Prompt matching video start -->
+        <div class="click-prompt" id="clickPrompt">
+            <div class="pulse-heart"></div>
+            <span>Click Me :)<br><small>Birthday Queen !</small></span>
+        </div>
+
         <canvas id="treeCanvas"></canvas>
         <div class="love-message" id="loveMessage"></div>
         <audio id="myAudio" loop>
