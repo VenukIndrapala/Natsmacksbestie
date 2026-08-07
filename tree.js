@@ -38,7 +38,7 @@ loginForm.addEventListener('submit', (e) => {
     }
 });
 
-// Clicking the prompt triggers the exact falling heart animation from the button position
+// Click Me prompt click handler: starts falling heart precisely from the button position
 clickPrompt.addEventListener('click', (e) => {
     const rect = clickPrompt.getBoundingClientRect();
     const startX = rect.left + rect.width / 2;
@@ -70,7 +70,7 @@ function startExactVideoReplication(btnX, btnY) {
     let targetGroundX = width / 2;
 
     let trunkProgress = 0;
-    let targetTrunkHeight = 130;
+    let targetTrunkHeight = 135;
 
     let rootBranch = null;
     let heartTargets = [];
@@ -96,19 +96,18 @@ function startExactVideoReplication(btnX, btnY) {
         ctx.restore();
     }
 
-    // Curved Trunk calculation matching the reference video curve
+    // Exact curved tree trunk mimicking the reference video shape & lean
     function drawCurvedTrunk(progress) {
         ctx.strokeStyle = treeColor;
-        ctx.lineWidth = 14;
+        ctx.lineWidth = 15;
         ctx.lineCap = "round";
         ctx.beginPath();
         ctx.moveTo(targetGroundX, groundY);
         
-        // Quadratic curve creating the organic lean/curve
         let currentH = targetTrunkHeight * progress;
-        let controlX = targetGroundX - 25 * progress;
+        let controlX = targetGroundX - 18 * progress;
         let controlY = groundY - currentH * 0.5;
-        let endX = targetGroundX - 10 * progress;
+        let endX = targetGroundX - 6 * progress;
         let endY = groundY - currentH;
 
         ctx.quadraticCurveTo(controlX, controlY, endX, endY);
@@ -132,13 +131,13 @@ function startExactVideoReplication(btnX, btnY) {
 
         update() {
             if (this.progress < 1) {
-                this.progress += 0.05;
+                this.progress += 0.06;
             } else if (!this.hasChild && this.gen < 5) {
                 this.hasChild = true;
                 let endX = this.x + Math.cos(this.angle) * this.length;
                 let endY = this.y + Math.sin(this.angle) * this.length;
-                this.children.push(new Branch(endX, endY, this.length * 0.75, this.angle - 0.45, this.thickness * 0.7, this.gen + 1));
-                this.children.push(new Branch(endX, endY, this.length * 0.75, this.angle + 0.45, this.thickness * 0.7, this.gen + 1));
+                this.children.push(new Branch(endX, endY, this.length * 0.75, this.angle - 0.42, this.thickness * 0.7, this.gen + 1));
+                this.children.push(new Branch(endX, endY, this.length * 0.75, this.angle + 0.42, this.thickness * 0.7, this.gen + 1));
             }
             this.children.forEach(c => c.update());
         }
@@ -179,18 +178,18 @@ function startExactVideoReplication(btnX, btnY) {
             this.cx = startX;
             this.cy = startY;
             this.progress = 0;
-            this.speed = 0.08;
-            this.size = Math.random() * 3 + 7;
+            this.speed = 0.07;
+            this.size = Math.random() * 3 + 7.5;
             
             const hues = [340, 350, 15, 30, 45, 320];
-            this.color = `hsl(${hues[Math.floor(Math.random() * hues.length)]}, 100%, 70%)`;
+            this.color = `hsl(${hues[Math.floor(Math.random() * hues.length)]}, 100%, 72%)`;
         }
 
         update() {
             if (this.progress < 1) {
                 this.progress += this.speed;
-                this.cx += (this.tx - this.cx) * 0.2;
-                this.cy += (this.ty - this.cy) * 0.2;
+                this.cx += (this.tx - this.cx) * 0.22;
+                this.cy += (this.ty - this.cy) * 0.22;
             }
         }
 
@@ -227,15 +226,15 @@ function startExactVideoReplication(btnX, btnY) {
         }
     }
 
-    // Pre-calculate heart canopy layout positions
-    for (let i = 0; i < 380; i++) {
-        let t = (i / 380) * Math.PI * 2;
+    // Form heart-shaped boundary profile canopy mapping exactly like the reference video
+    for (let i = 0; i < 400; i++) {
+        let t = (i / 400) * Math.PI * 2;
         let x = 16 * Math.pow(Math.sin(t), 3);
         let y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
         let fillFactor = Math.random();
         heartTargets.push({
-            x: targetGroundX + x * 10.5 * Math.sqrt(fillFactor),
-            y: (groundY - targetTrunkHeight - 105) + y * 10.5 * Math.sqrt(fillFactor)
+            x: targetGroundX + x * 10.8 * Math.sqrt(fillFactor),
+            y: (groundY - targetTrunkHeight - 110) + y * 10.8 * Math.sqrt(fillFactor)
         });
     }
 
@@ -251,10 +250,10 @@ function startExactVideoReplication(btnX, btnY) {
     });
 
     function animate() {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
         ctx.fillRect(0, 0, width, height);
 
-        // Ground baseline
+        // Ground baseline line
         ctx.strokeStyle = "#ffffff";
         ctx.lineWidth = 2;
         ctx.beginPath();
@@ -263,27 +262,26 @@ function startExactVideoReplication(btnX, btnY) {
         ctx.stroke();
 
         if (state === 'FALLING_HEART') {
-            // Heart falling from click prompt position down to baseline
             drawHeartShape(heartX, heartY, 12, "#ffb6c1");
             ctx.shadowBlur = 15;
             ctx.shadowColor = "#ffb6c1";
             drawHeartShape(heartX, heartY, 12, "#ffb6c1");
             ctx.shadowBlur = 0;
 
-            heartY += (groundY - heartY) * 0.15;
-            heartX += (targetGroundX - heartX) * 0.15;
+            heartY += (groundY - heartY) * 0.16;
+            heartX += (targetGroundX - heartX) * 0.16;
 
-            if (Math.abs(heartY - groundY) < 4) {
+            if (Math.abs(heartY - groundY) < 3.5) {
                 state = 'GROWING_TRUNK';
             }
         } 
         else if (state === 'GROWING_TRUNK') {
             if (trunkProgress < 1) {
-                trunkProgress += 0.04;
+                trunkProgress += 0.045;
             } else {
                 state = 'BRANCHING';
                 let topTip = drawCurvedTrunk(1);
-                rootBranch = new Branch(topTip.x, topTip.y, 85, -Math.PI / 2 - 0.15, 12, 1);
+                rootBranch = new Branch(topTip.x, topTip.y, 80, -Math.PI / 2 - 0.12, 12, 1);
             }
 
             drawCurvedTrunk(trunkProgress);
@@ -308,8 +306,8 @@ function startExactVideoReplication(btnX, btnY) {
             drawCurvedTrunk(1);
             rootBranch.draw();
 
-            // Pop hearts up in a gradual sequence rather than all at once
-            let batchSize = 12;
+            // Sequence heart blooming gradually so they don't pop all at once
+            let batchSize = 10;
             for (let i = 0; i < batchSize && scheduledHearts.length > 0; i++) {
                 activeHearts.push(scheduledHearts.shift());
             }
