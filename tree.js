@@ -73,6 +73,54 @@ function startExactVideoReplication() {
 
     const treeColor = "#ffb6c1";
 
+    // Draws a solid, tapered branch/trunk segment (wide at the start,
+    // narrower at the end) instead of a uniform-width stroked line, to
+    // match the filled, tapered look of the tree in the reference video.
+    function drawTaperedSegment(x1, y1, x2, y2, w1, w2, color) {
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const len = Math.hypot(dx, dy);
+        if (len < 0.0001) return;
+        const nx = -dy / len;
+        const ny = dx / len;
+        const h1 = w1 / 2;
+        const h2 = w2 / 2;
+
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(x1 + nx * h1, y1 + ny * h1);
+        ctx.lineTo(x2 + nx * h2, y2 + ny * h2);
+        // Rounded tip so branch ends look organic rather than cut flat.
+        ctx.arc(x2, y2, h2, Math.atan2(ny, nx), Math.atan2(-ny, -nx));
+        ctx.lineTo(x1 - nx * h1, y1 - ny * h1);
+        ctx.arc(x1, y1, h1, Math.atan2(-ny, -nx), Math.atan2(ny, nx));
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    // Same idea as drawTaperedSegment but with flat (not rounded) ends --
+    // used for the trunk so its base sits flush with the ground line
+    // instead of showing a rounded notch.
+    function drawTaperedTrapezoid(x1, y1, x2, y2, w1, w2, color) {
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const len = Math.hypot(dx, dy);
+        if (len < 0.0001) return;
+        const nx = -dy / len;
+        const ny = dx / len;
+        const h1 = w1 / 2;
+        const h2 = w2 / 2;
+
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(x1 + nx * h1, y1 + ny * h1);
+        ctx.lineTo(x2 + nx * h2, y2 + ny * h2);
+        ctx.lineTo(x2 - nx * h2, y2 - ny * h2);
+        ctx.lineTo(x1 - nx * h1, y1 - ny * h1);
+        ctx.closePath();
+        ctx.fill();
+    }
+
     // Helper to draw true geometric heart shapes matching the video
     function drawHeartShape(x, y, size, color) {
         ctx.save();
@@ -106,12 +154,13 @@ function startExactVideoReplication() {
         update() {
             if (this.progress < 1) {
                 this.progress += 0.04;
-            } else if (!this.hasChild && this.gen < 5) {
+            } else if (!this.hasChild && this.gen < 4) {
                 this.hasChild = true;
                 let endX = this.x + Math.cos(this.angle) * this.length;
                 let endY = this.y + Math.sin(this.angle) * this.length;
-                this.children.push(new Branch(endX, endY, this.length * 0.75, this.angle - 0.4, this.thickness * 0.7, this.gen + 1));
-                this.children.push(new Branch(endX, endY, this.length * 0.75, this.angle + 0.4, this.thickness * 0.7, this.gen + 1));
+                const spread = 0.35 + Math.random() * 0.15;
+                this.children.push(new Branch(endX, endY, this.length * 0.68, this.angle - spread, this.thickness * 0.62, this.gen + 1));
+                this.children.push(new Branch(endX, endY, this.length * 0.68, this.angle + spread, this.thickness * 0.62, this.gen + 1));
             }
             this.children.forEach(c => c.update());
         }
@@ -121,13 +170,7 @@ function startExactVideoReplication() {
             let endX = this.x + Math.cos(this.angle) * currentLen;
             let endY = this.y + Math.sin(this.angle) * currentLen;
 
-            ctx.strokeStyle = treeColor;
-            ctx.lineWidth = this.thickness;
-            ctx.lineCap = "round";
-            ctx.beginPath();
-            ctx.moveTo(this.x, this.y);
-            ctx.lineTo(endX, endY);
-            ctx.stroke();
+            drawTaperedSegment(this.x, this.y, endX, endY, this.thickness, this.thickness * 0.58, treeColor);
 
             this.children.forEach(c => c.draw());
         }
@@ -227,15 +270,15 @@ function startExactVideoReplication() {
     });
 
     function animate() {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
-        ctx.fillRect(0, 0, width, height);
+        ctx.clearRect(0, 0, width, height);
 
-        // Ground baseline
+        // Ground baseline (spans most of the screen width, matching the video)
+        const groundMargin = width * 0.08;
         ctx.strokeStyle = "#ffffff";
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(width / 2 - 320, groundY);
-        ctx.lineTo(width / 2 + 320, groundY);
+        ctx.moveTo(groundMargin, groundY);
+        ctx.lineTo(width - groundMargin, groundY);
         ctx.stroke();
 
         if (state === 'FALLING_DOT') {
@@ -257,25 +300,13 @@ function startExactVideoReplication() {
                 trunkHeight += 4;
             } else {
                 state = 'BRANCHING';
-                rootBranch = new Branch(width / 2, groundY - targetTrunkHeight, 95, -Math.PI / 2, trunkWidth, 1);
+                rootBranch = new Branch(width / 2, groundY - targetTrunkHeight, 78, -Math.PI / 2, trunkWidth, 1);
             }
 
-            ctx.strokeStyle = treeColor;
-            ctx.lineWidth = trunkWidth;
-            ctx.lineCap = "round";
-            ctx.beginPath();
-            ctx.moveTo(width / 2, groundY);
-            ctx.lineTo(width / 2, groundY - trunkHeight);
-            ctx.stroke();
+            drawTaperedTrapezoid(width / 2, groundY, width / 2, groundY - trunkHeight, trunkWidth * 1.8, trunkWidth * 0.9, treeColor);
         } 
         else if (state === 'BRANCHING') {
-            ctx.strokeStyle = treeColor;
-            ctx.lineWidth = trunkWidth;
-            ctx.lineCap = "round";
-            ctx.beginPath();
-            ctx.moveTo(width / 2, groundY);
-            ctx.lineTo(width / 2, groundY - targetTrunkHeight);
-            ctx.stroke();
+            drawTaperedTrapezoid(width / 2, groundY, width / 2, groundY - targetTrunkHeight, trunkWidth * 1.8, trunkWidth * 0.9, treeColor);
 
             rootBranch.update();
             rootBranch.draw();
