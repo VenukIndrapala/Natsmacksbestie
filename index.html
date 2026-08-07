@@ -4,11 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lamp Login</title>
+    <title>Lamp Login & Heart Animation</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="scene-wrapper">
+    <!-- Initial Lamp Page View -->
+    <div class="scene-wrapper" id="lampScene">
         <!-- Lamp Component (Locked & Unchanged) -->
         <div class="lamp-container">
             <div class="lamp-shade-shadow"></div>
@@ -27,17 +28,23 @@
             <div class="lamp-glow"></div>
         </div>
 
-        <!-- Login Card: Username removed, height made smaller, width optimized for mobile without overlapping -->
+        <!-- Login Card -->
         <div class="login-card" id="loginCard">
             <h2>Welcome</h2>
-            <form onsubmit="event.preventDefault();">
+            <form id="loginForm">
                 <div class="input-group">
                     <label>Password</label>
-                    <input type="password" placeholder="••••••••" required>
+                    <input type="password" id="passwordInput" placeholder="••••••••" required>
                 </div>
                 <button type="submit" class="sign-in-btn">Sign In</button>
             </form>
         </div>
+    </div>
+
+    <!-- Heart Animation Page View (Triggered upon correct password) -->
+    <div class="heart-scene" id="heartScene">
+        <canvas id="heartCanvas"></canvas>
+        <div class="text-container" id="textContainer"></div>
     </div>
 
     <script src="tree.js"></script>
