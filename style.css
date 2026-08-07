@@ -20,7 +20,6 @@ body.active {
     background-color: #27231e;
 }
 
-/* --- Unchanged Lamp CSS --- */
 .scene-wrapper {
     position: relative;
     width: 100%;
@@ -248,7 +247,6 @@ body.active .lamp-glow {
     transform: scale(0.98);
 }
 
-/* --- Video Animation Scene Styles --- */
 .video-animation-scene {
     position: fixed;
     top: 0;
