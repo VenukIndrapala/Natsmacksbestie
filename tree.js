@@ -50,7 +50,7 @@ clickPrompt.addEventListener('click', (e) => {
     }, 400);
 });
 
-// --- Refined Tree Animation Logic ---
+// --- Final Replicated Tree Animation Logic ---
 function startExactTreeGrowth(btnX, btnY) {
     const canvas = document.getElementById('treeCanvas');
     const ctx = canvas.getContext('2d');
@@ -122,37 +122,31 @@ function startExactTreeGrowth(btnX, btnY) {
     let branches = [];
 
     function setupBranches() {
-        // ADJUSTMENTS:
-        // 1. Trunk made longer before branches start.
-        // 2. All branches shifted upwards.
-        // 3. Control points modified to add a sweeping upward bend.
+        // EXACT TOPOLOGY MATCHING image_f599f3.png
+        
+        // 1. Main Trunk (Slight organic lean matching the image)
+        branches.push(new CubicBranch(0, 0, 2, -50, 4, -100, 3, -155, 24, 9, 0));
 
-        // 1. Main Trunk (Slightly longer, organic straight line)
-        branches.push(new CubicBranch(0, 0, -1, -50, 2, -100, 0, -145, 23, 9.5, 0));
+        // 2. Lower Left Branch (The prominent single branch shooting left)
+        branches.push(new CubicBranch(-1, -75, -45, -85, -85, -100, -118, -118, 6.5, 0.1, 15));
 
-        // 2. Lower Right Branch (Starts higher, bends up smoothly)
-        branches.push(new CubicBranch(0, -60, 50, -55, 85, -85, 110, -125, 7, 0.1, 15));
+        // 3. Middle Right Branch (Lower-mid right branch)
+        branches.push(new CubicBranch(1, -110, 40, -120, 75, -135, 105, -150, 5, 0.1, 30));
 
-        // 3. Lower Left Branch (Starts higher, bends up smoothly)
-        branches.push(new CubicBranch(0, -75, -50, -70, -85, -100, -110, -140, 7, 0.1, 20));
+        // 4. Upper-Middle Left Branch (Split higher up on the left side)
+        branches.push(new CubicBranch(2, -130, -30, -145, -60, -165, -85, -185, 4.5, 0.1, 45));
 
-        // 4. Middle Right Branch (Higher placement, curved sweep)
-        branches.push(new CubicBranch(0, -100, 35, -105, 60, -140, 80, -175, 5.5, 0.1, 35));
+        // 5. Main Top Right Primary Fork
+        branches.push(new CubicBranch(3, -155, 20, -190, 35, -225, 50, -260, 8.5, 0.1, 60));
 
-        // 5. Middle Left Branch (Higher placement, curved sweep)
-        branches.push(new CubicBranch(0, -115, -35, -120, -60, -155, -80, -190, 5.5, 0.1, 40));
+        // 6. Main Top Left Primary Fork
+        branches.push(new CubicBranch(3, -155, -12, -185, -22, -215, -35, -250, 8.5, 0.1, 60));
 
-        // 6. Top Right V-Split (Main canopy top)
-        branches.push(new CubicBranch(0, -140, 15, -180, 25, -220, 35, -260, 9, 0.1, 55));
+        // 7. Tiny Sub-branch sprouting off Upper-Right Fork
+        branches.push(new CubicBranch(35, -210, 50, -220, 68, -230, 80, -240, 3.2, 0.1, 80));
 
-        // 7. Top Left V-Split (Main canopy top)
-        branches.push(new CubicBranch(0, -140, -15, -180, -25, -215, -35, -255, 9, 0.1, 55));
-
-        // 8. Outer Sub-branch off Top Right (Organic split)
-        branches.push(new CubicBranch(12, -185, 35, -195, 55, -220, 70, -250, 3.5, 0.1, 75));
-
-        // 9. Outer Sub-branch off Top Left (Organic split)
-        branches.push(new CubicBranch(-12, -185, -35, -195, -55, -215, -70, -245, 3.5, 0.1, 75));
+        // 8. Tiny Sub-branch sprouting off Upper-Left Fork
+        branches.push(new CubicBranch(-15, -195, -32, -205, -50, -215, -62, -225, 3.2, 0.1, 80));
     }
 
     function drawDot(x, y, radius, color) {
@@ -188,7 +182,6 @@ function startExactTreeGrowth(btnX, btnY) {
             }
         } 
         else if (state === 'GROWING_TREE') {
-            // Apply clipping to cut the trunk off perfectly flush at the ground line
             ctx.save();
             ctx.beginPath();
             ctx.rect(0, 0, width, groundY - 1); 
