@@ -266,7 +266,7 @@ body.active .lamp-glow {
     display: flex;
 }
 
-/* Click Me Prompt Styling matching video start */
+/* Click Me Prompt Styling */
 .click-prompt {
     position: absolute;
     top: 40%;
