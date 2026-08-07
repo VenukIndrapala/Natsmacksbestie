@@ -248,7 +248,7 @@ body.active .lamp-glow {
     transform: scale(0.98);
 }
 
-/* Video Replica Scene Styles */
+/* Video Animation Scene Styles */
 .video-animation-scene {
     position: fixed;
     top: 0;
