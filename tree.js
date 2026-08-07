@@ -38,7 +38,6 @@ loginForm.addEventListener('submit', (e) => {
     }
 });
 
-// --- Trigger Animation Logic ---
 clickPrompt.addEventListener('click', (e) => {
     const rect = clickPrompt.getBoundingClientRect();
     const startX = rect.left + rect.width / 2;
@@ -51,7 +50,7 @@ clickPrompt.addEventListener('click', (e) => {
     }, 400);
 });
 
-// --- Exact Video Replication Code (Dot + Trunk + Branches Only) ---
+// --- Exact Video Replication Code (Dot + Ground + Seamless Organic Tree) ---
 function startExactTreeGrowth(btnX, btnY) {
     const canvas = document.getElementById('treeCanvas');
     const ctx = canvas.getContext('2d');
@@ -66,33 +65,28 @@ function startExactTreeGrowth(btnX, btnY) {
 
     let state = 'FALLING_DOT';
     
-    // Dot variables
     let dotX = btnX;
     let dotY = btnY;
     
-    // Layout anchor points
-    let groundY = height - 120; // Exact baseline where the trunk hits the floor
-    let targetGroundX = width / 2; // Center of screen
-    
-    // Trunk variables
-    let trunkProgress = 0;
-    let targetTrunkHeight = 180;
-    const trunkColor = "#774E39"; // Deep brown matching the video
+    // Core Layout
+    let targetGroundX = width / 2;
+    let groundY = height - 120;
+    const trunkColor = "#744527"; // Exact rich brown from the target image
 
-    // Branch drawing utility to create smooth, tapering bezier curves
-    class BezierBranch {
-        constructor(startX, startY, cpX, cpY, endX, endY, startWidth, endWidth, delay) {
-            this.sx = startX;
-            this.sy = startY;
-            this.cpx = cpX;
-            this.cpy = cpY;
-            this.ex = endX;
-            this.ey = endY;
-            this.sw = startWidth;
-            this.ew = endWidth;
+    // Draws organic, flawlessly tapering branches using dense microscopic circles along a Cubic Bézier curve
+    class CubicBranch {
+        constructor(sx, sy, cp1x, cp1y, cp2x, cp2y, ex, ey, w0, w1, delay) {
+            const scale = 1.35; // Global scale to ensure the tree matches the screen presence
+            
+            this.p0 = { x: sx * scale, y: sy * scale };
+            this.p1 = { x: cp1x * scale, y: cp1y * scale };
+            this.p2 = { x: cp2x * scale, y: cp2y * scale };
+            this.p3 = { x: ex * scale, y: ey * scale };
+            this.w0 = w0 * scale;
+            this.w1 = w1 * scale;
             this.delay = delay;
             this.progress = 0;
-            this.speed = 0.035; 
+            this.speed = 0.012; // Slow, natural unrolling speed
         }
 
         update() {
@@ -102,31 +96,28 @@ function startExactTreeGrowth(btnX, btnY) {
             }
             if (this.progress < 1) {
                 this.progress += this.speed;
+                if (this.progress > 1) this.progress = 1;
             }
         }
 
-        // Draw the curve progressively using small segments to allow smooth tapering
-        draw(ctx) {
+        draw(ctx, offsetX, offsetY) {
             if (this.progress <= 0) return;
-
-            let steps = Math.floor(50 * this.progress);
-            if (steps < 1) steps = 1;
-
+            
+            // High density step count guarantees completely smooth edges without jagged breaks
+            let steps = Math.floor(300 * this.progress); 
             ctx.fillStyle = trunkColor;
-
+            
             for (let i = 0; i <= steps; i++) {
-                let t = i / 50; 
+                let t = i / 300;
                 let invT = 1 - t;
-
-                // Quadratic Bezier interpolation
-                let currX = invT * invT * this.sx + 2 * invT * t * this.cpx + t * t * this.ex;
-                let currY = invT * invT * this.sy + 2 * invT * t * this.cpy + t * t * this.ey;
                 
-                // Interpolate width so the branch gets thinner towards the tip
-                let currWidth = this.sw - ((this.sw - this.ew) * t);
-
+                // Standard Cubic Bezier Equation
+                let x = invT*invT*invT*this.p0.x + 3*invT*invT*t*this.p1.x + 3*invT*t*t*this.p2.x + t*t*t*this.p3.x;
+                let y = invT*invT*invT*this.p0.y + 3*invT*invT*t*this.p1.y + 3*invT*t*t*this.p2.y + t*t*t*this.p3.y;
+                let w = this.w0 - (this.w0 - this.w1) * t;
+                
                 ctx.beginPath();
-                ctx.arc(currX, currY, currWidth / 2, 0, Math.PI * 2);
+                ctx.arc(offsetX + x, offsetY + y, w / 2, 0, Math.PI * 2);
                 ctx.fill();
             }
         }
@@ -135,34 +126,38 @@ function startExactTreeGrowth(btnX, btnY) {
     let branches = [];
 
     function setupBranches() {
-        let tX = targetGroundX;
-        let tY = groundY - targetTrunkHeight; // Top of the trunk
+        // Precise topological mapping of "image_01d3ff.png" 
+        // Format: startX, startY, control1X, control1Y, control2X, control2Y, endX, endY, startWidth, endWidth, delay
 
-        // Hardcoded exact replica layout from the 00:02 mark of the video
+        // 1. Main Trunk (Slight lean, tapering up to the Y split)
+        branches.push(new CubicBranch(0, 0, -2, -40, -4, -80, -5, -120, 22, 13, 0));
         
-        // 1. Main Left Branch (curves out left and up)
-        branches.push(new BezierBranch(tX, tY + 10, tX - 50, tY - 40, tX - 90, tY - 60, 10, 2, 0));
+        // 2. Lowest Right Branch (Long graceful sweeping arc right)
+        branches.push(new CubicBranch(2, -30, 40, -35, 80, -50, 120, -90, 7.5, 0.5, 20));
         
-        // 2. Main Right Branch (curves out right and up)
-        branches.push(new BezierBranch(tX, tY + 10, tX + 60, tY - 50, tX + 100, tY - 70, 10, 2, 0));
+        // 3. Lowest Left Branch
+        branches.push(new CubicBranch(-4, -60, -40, -65, -80, -75, -115, -110, 6.5, 0.5, 40));
         
-        // 3. Lower Left Branch (sprouts lower on trunk)
-        branches.push(new BezierBranch(tX, tY + 60, tX - 60, tY + 40, tX - 80, tY - 10, 7, 1, 10));
-
-        // 4. Middle Left Sub-branch (sprouts from left main branch)
-        branches.push(new BezierBranch(tX - 40, tY - 20, tX - 45, tY - 60, tX - 60, tY - 90, 5, 1, 15));
-
-        // 5. High Central Left Sub-branch
-        branches.push(new BezierBranch(tX - 10, tY - 15, tX - 15, tY - 50, tX - 25, tY - 100, 4, 1, 15));
-
-        // 6. High Central Right Sub-branch (sprouts from right main)
-        branches.push(new BezierBranch(tX + 30, tY - 25, tX + 25, tY - 60, tX + 20, tY - 100, 6, 1, 15));
-
-        // 7. Middle Right Sub-branch (sprouts from right main)
-        branches.push(new BezierBranch(tX + 50, tY - 40, tX + 80, tY - 60, tX + 90, tY - 100, 5, 1, 20));
+        // 4. Middle Right Branch
+        branches.push(new CubicBranch(-1, -85, 30, -95, 60, -110, 95, -140, 5, 0.5, 55));
         
-        // 8. Lower Right Sub-branch
-        branches.push(new BezierBranch(tX + 25, tY + 40, tX + 70, tY + 20, tX + 110, tY - 10, 6, 1, 15));
+        // 5. Left Main Split (The left half of the upper Y)
+        branches.push(new CubicBranch(-5, -119, -20, -160, -40, -190, -65, -220, 13, 1, 80));
+        
+        // 6. Right Main Split (The right half of the upper Y)
+        branches.push(new CubicBranch(-5, -119, 15, -160, 25, -200, 45, -230, 13, 1, 80));
+        
+        // 7. Outer Sub-branch off Left Main
+        branches.push(new CubicBranch(-25, -168, -50, -170, -80, -175, -100, -190, 4.5, 0.5, 105));
+        
+        // 8. Inner Sub-branch off Left Main (Shooting mostly straight up)
+        branches.push(new CubicBranch(-45, -200, -45, -220, -42, -240, -40, -270, 3.5, 0.5, 120));
+        
+        // 9. Outer Sub-branch off Right Main
+        branches.push(new CubicBranch(15, -170, 40, -175, 65, -185, 85, -200, 4.5, 0.5, 105));
+        
+        // 10. Inner Sub-branch off Right Main (Shooting mostly straight up)
+        branches.push(new CubicBranch(25, -200, 20, -220, 15, -240, 10, -270, 3.5, 0.5, 120));
     }
 
     function drawDot(x, y, radius, color) {
@@ -172,70 +167,38 @@ function startExactTreeGrowth(btnX, btnY) {
         ctx.fill();
     }
 
-    // Draws the trunk as a filled tapering polygon (wider at base, narrow at top)
-    function drawTrunkPolygon(progress) {
-        let currentHeight = targetTrunkHeight * progress;
-        
-        // Tapering parameters
-        let baseHalfWidth = 14; 
-        let topHalfWidth = 14 - (8 * progress); // Narrows smoothly as it grows up
-
-        ctx.fillStyle = trunkColor;
-        ctx.beginPath();
-        
-        // Bottom left corner
-        ctx.moveTo(targetGroundX - baseHalfWidth, groundY);
-        // Bottom right corner
-        ctx.lineTo(targetGroundX + baseHalfWidth, groundY);
-        // Top right corner
-        ctx.lineTo(targetGroundX + topHalfWidth, groundY - currentHeight);
-        // Top left corner
-        ctx.lineTo(targetGroundX - topHalfWidth, groundY - currentHeight);
-        
-        ctx.closePath();
-        ctx.fill();
-        
-        // Cap the top to ensure a smooth transition into branches
-        ctx.beginPath();
-        ctx.arc(targetGroundX, groundY - currentHeight, topHalfWidth, 0, Math.PI * 2);
-        ctx.fill();
-    }
-
     function animate() {
         ctx.clearRect(0, 0, width, height);
 
+        // Draw the exact solid ground line seen in the reference image
+        ctx.strokeStyle = "#1a1a1a";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, groundY);
+        ctx.lineTo(width, groundY);
+        ctx.stroke();
+
         if (state === 'FALLING_DOT') {
-            // Drop dot straight down
             ctx.shadowBlur = 12;
             ctx.shadowColor = "#e91e63";
             drawDot(dotX, dotY, 6, "#e91e63");
             ctx.shadowBlur = 0;
 
-            dotY += 12; // Flat velocity downward
-            dotX += (targetGroundX - dotX) * 0.1; // Smooth out x-axis quickly to center
+            dotY += 12; 
+            dotX += (targetGroundX - dotX) * 0.1; 
 
-            if (dotY >= groundY) {
-                state = 'GROWING_TRUNK';
+            // Allow the dot to sink just below the surface line before starting growth
+            if (dotY >= groundY + 2) {
+                state = 'GROWING_TREE';
+                setupBranches(); 
             }
         } 
-        else if (state === 'GROWING_TRUNK') {
-            if (trunkProgress < 1) {
-                trunkProgress += 0.035;
-            } else {
-                trunkProgress = 1;
-                state = 'GROWING_BRANCHES';
-                setupBranches(); // Initialize exact branches when trunk finishes
-            }
-            drawTrunkPolygon(trunkProgress);
-        } 
-        else if (state === 'GROWING_BRANCHES') {
-            drawTrunkPolygon(1);
-            
+        else if (state === 'GROWING_TREE') {
             branches.forEach(branch => {
                 branch.update();
-                branch.draw(ctx);
+                // We sink the origin 2 pixels down so the trunk base sits flush on the horizontal line
+                branch.draw(ctx, targetGroundX, groundY + 2);
             });
-            // Stop here for this step. No hearts. No text.
         }
 
         requestAnimationFrame(animate);
