@@ -38,15 +38,20 @@ loginForm.addEventListener('submit', (e) => {
     }
 });
 
-clickPrompt.addEventListener('click', () => {
+// Clicking the prompt triggers the exact falling heart animation from the button position
+clickPrompt.addEventListener('click', (e) => {
+    const rect = clickPrompt.getBoundingClientRect();
+    const startX = rect.left + rect.width / 2;
+    const startY = rect.top + rect.height / 2;
+
     clickPrompt.style.opacity = '0';
     setTimeout(() => {
         clickPrompt.style.display = 'none';
-        startExactVideoReplication();
-    }, 500);
+        startExactVideoReplication(startX, startY);
+    }, 400);
 });
 
-function startExactVideoReplication() {
+function startExactVideoReplication(btnX, btnY) {
     const canvas = document.getElementById('treeCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -58,22 +63,23 @@ function startExactVideoReplication() {
         height = canvas.height = window.innerHeight;
     });
 
-    let state = 'FALLING_HEART'; // Matches video starting with the heart falling down
-    let dotY = height / 2 - 180;
+    let state = 'FALLING_HEART';
+    let heartX = btnX;
+    let heartY = btnY;
     let groundY = height - 140;
-    
-    let trunkHeight = 0;
+    let targetGroundX = width / 2;
+
+    let trunkProgress = 0;
     let targetTrunkHeight = 130;
-    let trunkWidth = 14;
 
     let rootBranch = null;
-    let hearts = [];
-    let heartSpawned = false;
+    let heartTargets = [];
+    let scheduledHearts = [];
+    let activeHearts = [];
     let interactiveFallingHearts = [];
 
     const treeColor = "#ffb6c1";
 
-    // Precise geometric heart shape matching the video style
     function drawHeartShape(x, y, size, color) {
         ctx.save();
         ctx.translate(x, y);
@@ -88,6 +94,27 @@ function startExactVideoReplication() {
         ctx.closePath();
         ctx.fill();
         ctx.restore();
+    }
+
+    // Curved Trunk calculation matching the reference video curve
+    function drawCurvedTrunk(progress) {
+        ctx.strokeStyle = treeColor;
+        ctx.lineWidth = 14;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(targetGroundX, groundY);
+        
+        // Quadratic curve creating the organic lean/curve
+        let currentH = targetTrunkHeight * progress;
+        let controlX = targetGroundX - 25 * progress;
+        let controlY = groundY - currentH * 0.5;
+        let endX = targetGroundX - 10 * progress;
+        let endY = groundY - currentH;
+
+        ctx.quadraticCurveTo(controlX, controlY, endX, endY);
+        ctx.stroke();
+
+        return { x: endX, y: endY };
     }
 
     class Branch {
@@ -105,13 +132,13 @@ function startExactVideoReplication() {
 
         update() {
             if (this.progress < 1) {
-                this.progress += 0.04;
+                this.progress += 0.05;
             } else if (!this.hasChild && this.gen < 5) {
                 this.hasChild = true;
                 let endX = this.x + Math.cos(this.angle) * this.length;
                 let endY = this.y + Math.sin(this.angle) * this.length;
-                this.children.push(new Branch(endX, endY, this.length * 0.75, this.angle - 0.4, this.thickness * 0.7, this.gen + 1));
-                this.children.push(new Branch(endX, endY, this.length * 0.75, this.angle + 0.4, this.thickness * 0.7, this.gen + 1));
+                this.children.push(new Branch(endX, endY, this.length * 0.75, this.angle - 0.45, this.thickness * 0.7, this.gen + 1));
+                this.children.push(new Branch(endX, endY, this.length * 0.75, this.angle + 0.45, this.thickness * 0.7, this.gen + 1));
             }
             this.children.forEach(c => c.update());
         }
@@ -152,8 +179,8 @@ function startExactVideoReplication() {
             this.cx = startX;
             this.cy = startY;
             this.progress = 0;
-            this.speed = Math.random() * 0.035 + 0.025;
-            this.size = Math.random() * 4 + 7;
+            this.speed = 0.08;
+            this.size = Math.random() * 3 + 7;
             
             const hues = [340, 350, 15, 30, 45, 320];
             this.color = `hsl(${hues[Math.floor(Math.random() * hues.length)]}, 100%, 70%)`;
@@ -162,8 +189,8 @@ function startExactVideoReplication() {
         update() {
             if (this.progress < 1) {
                 this.progress += this.speed;
-                this.cx += (this.tx - this.cx) * 0.12;
-                this.cy += (this.ty - this.cy) * 0.12;
+                this.cx += (this.tx - this.cx) * 0.2;
+                this.cy += (this.ty - this.cy) * 0.2;
             }
         }
 
@@ -200,15 +227,15 @@ function startExactVideoReplication() {
         }
     }
 
-    let heartTargets = [];
-    for (let i = 0; i < 450; i++) {
-        let t = (i / 450) * Math.PI * 2;
+    // Pre-calculate heart canopy layout positions
+    for (let i = 0; i < 380; i++) {
+        let t = (i / 380) * Math.PI * 2;
         let x = 16 * Math.pow(Math.sin(t), 3);
         let y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
         let fillFactor = Math.random();
         heartTargets.push({
-            x: width / 2 + x * 11 * Math.sqrt(fillFactor),
-            y: (groundY - targetTrunkHeight - 110) + y * 11 * Math.sqrt(fillFactor)
+            x: targetGroundX + x * 10.5 * Math.sqrt(fillFactor),
+            y: (groundY - targetTrunkHeight - 105) + y * 10.5 * Math.sqrt(fillFactor)
         });
     }
 
@@ -218,7 +245,7 @@ function startExactVideoReplication() {
         const clickY = e.clientY - rect.top;
 
         for (let i = 0; i < 15; i++) {
-            let sourceHeart = hearts.length > 0 ? hearts[Math.floor(Math.random() * hearts.length)] : {cx: clickX, cy: clickY, color: '#ffb6c1'};
+            let sourceHeart = activeHearts.length > 0 ? activeHearts[Math.floor(Math.random() * activeHearts.length)] : {cx: clickX, cy: clickY, color: '#ffb6c1'};
             interactiveFallingHearts.push(new FallingHeart(sourceHeart.cx, sourceHeart.cy, sourceHeart.color));
         }
     });
@@ -236,70 +263,70 @@ function startExactVideoReplication() {
         ctx.stroke();
 
         if (state === 'FALLING_HEART') {
-            // Render the falling heart matching the reference video beginning
-            drawHeartShape(width / 2, dotY, 12, "#ffb6c1");
+            // Heart falling from click prompt position down to baseline
+            drawHeartShape(heartX, heartY, 12, "#ffb6c1");
             ctx.shadowBlur = 15;
             ctx.shadowColor = "#ffb6c1";
-            drawHeartShape(width / 2, dotY, 12, "#ffb6c1");
+            drawHeartShape(heartX, heartY, 12, "#ffb6c1");
             ctx.shadowBlur = 0;
 
-            dotY += 7;
-            if (dotY >= groundY) {
+            heartY += (groundY - heartY) * 0.15;
+            heartX += (targetGroundX - heartX) * 0.15;
+
+            if (Math.abs(heartY - groundY) < 4) {
                 state = 'GROWING_TRUNK';
             }
         } 
         else if (state === 'GROWING_TRUNK') {
-            if (trunkHeight < targetTrunkHeight) {
-                trunkHeight += 4;
+            if (trunkProgress < 1) {
+                trunkProgress += 0.04;
             } else {
                 state = 'BRANCHING';
-                rootBranch = new Branch(width / 2, groundY - targetTrunkHeight, 95, -Math.PI / 2, trunkWidth, 1);
+                let topTip = drawCurvedTrunk(1);
+                rootBranch = new Branch(topTip.x, topTip.y, 85, -Math.PI / 2 - 0.15, 12, 1);
             }
 
-            ctx.strokeStyle = treeColor;
-            ctx.lineWidth = trunkWidth;
-            ctx.lineCap = "round";
-            ctx.beginPath();
-            ctx.moveTo(width / 2, groundY);
-            ctx.lineTo(width / 2, groundY - trunkHeight);
-            ctx.stroke();
+            drawCurvedTrunk(trunkProgress);
         } 
         else if (state === 'BRANCHING') {
-            ctx.strokeStyle = treeColor;
-            ctx.lineWidth = trunkWidth;
-            ctx.lineCap = "round";
-            ctx.beginPath();
-            ctx.moveTo(width / 2, groundY);
-            ctx.lineTo(width / 2, groundY - targetTrunkHeight);
-            ctx.stroke();
-
+            let topTip = drawCurvedTrunk(1);
             rootBranch.update();
             rootBranch.draw();
 
-            if (rootBranch.progress >= 1 && rootBranch.children.length > 0 && !heartSpawned) {
-                heartSpawned = true;
+            if (rootBranch.progress >= 1 && rootBranch.children.length > 0 && scheduledHearts.length === 0) {
                 let terminals = [];
                 rootBranch.getTerminals(terminals);
 
                 heartTargets.forEach(target => {
-                    let src = terminals.length > 0 ? terminals[Math.floor(Math.random() * terminals.length)] : { x: width / 2, y: groundY - targetTrunkHeight };
-                    hearts.push(new TreeHeart(src.x, src.y, target.x, target.y));
+                    let src = terminals.length > 0 ? terminals[Math.floor(Math.random() * terminals.length)] : { x: topTip.x, y: topTip.y };
+                    scheduledHearts.push(new TreeHeart(src.x, src.y, target.x, target.y));
                 });
+                state = 'BLOOMING_HEARTS';
+            }
+        } 
+        else if (state === 'BLOOMING_HEARTS') {
+            drawCurvedTrunk(1);
+            rootBranch.draw();
+
+            // Pop hearts up in a gradual sequence rather than all at once
+            let batchSize = 12;
+            for (let i = 0; i < batchSize && scheduledHearts.length > 0; i++) {
+                activeHearts.push(scheduledHearts.shift());
             }
 
-            hearts.forEach(h => {
+            activeHearts.forEach(h => {
                 h.update();
                 h.draw();
             });
-
-            interactiveFallingHearts.forEach((fh, index) => {
-                fh.update();
-                fh.draw();
-                if (fh.y > height + 50) {
-                    interactiveFallingHearts.splice(index, 1);
-                }
-            });
         }
+
+        interactiveFallingHearts.forEach((fh, index) => {
+            fh.update();
+            fh.draw();
+            if (fh.y > height + 50) {
+                interactiveFallingHearts.splice(index, 1);
+            }
+        });
 
         requestAnimationFrame(animate);
     }
