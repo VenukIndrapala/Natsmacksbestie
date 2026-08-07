@@ -251,7 +251,7 @@ body.active .lamp-glow {
     transform: scale(0.98);
 }
 
-/* Exact Video Matching Animation Scene */
+/* Animation Scene */
 .video-animation-scene {
     position: fixed;
     top: 0;
