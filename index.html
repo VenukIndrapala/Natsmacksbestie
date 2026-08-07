@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="scene-wrapper">
-        <!-- Lamp Component with stationary positioning -->
+        <!-- Lamp Component (Locked & Unchanged) -->
         <div class="lamp-container">
             <div class="lamp-shade-shadow"></div>
             <div class="lamp-head">
@@ -17,7 +17,7 @@
             </div>
             <div class="lamp-stand-group">
                 <div class="lamp-stand"></div>
-                <!-- Pull Chain positioned right under the lamp shade -->
+                <!-- Pull Chain -->
                 <div class="chain-wrapper" id="chainToggle">
                     <div class="chain-cord"></div>
                     <div class="chain-ball"></div>
@@ -27,14 +27,10 @@
             <div class="lamp-glow"></div>
         </div>
 
-        <!-- Login Card popping up independently without moving the lamp -->
+        <!-- Login Card: Username removed, height made smaller, width optimized for mobile without overlapping -->
         <div class="login-card" id="loginCard">
             <h2>Welcome</h2>
             <form onsubmit="event.preventDefault();">
-                <div class="input-group">
-                    <label>Username</label>
-                    <input type="text" placeholder="Your name" required>
-                </div>
                 <div class="input-group">
                     <label>Password</label>
                     <input type="password" placeholder="••••••••" required>
