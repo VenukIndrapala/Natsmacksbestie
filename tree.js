@@ -38,7 +38,6 @@ loginForm.addEventListener('submit', (e) => {
     }
 });
 
-// Click prompt listener to launch the exact falling dot and tree growing animation from the reference video
 clickPrompt.addEventListener('click', () => {
     clickPrompt.style.opacity = '0';
     setTimeout(() => {
@@ -59,7 +58,7 @@ function startExactVideoReplication() {
         height = canvas.height = window.innerHeight;
     });
 
-    let state = 'FALLING_DOT'; // STATES: FALLING_DOT -> GROWING_TRUNK -> BRANCHING -> BLOOMING_HEART
+    let state = 'FALLING_DOT'; 
     let dotY = height / 2 - 180;
     let groundY = height - 140;
     
@@ -67,12 +66,29 @@ function startExactVideoReplication() {
     let targetTrunkHeight = 130;
     let trunkWidth = 14;
 
-    let branches = [];
-    let blossoms = [];
+    let rootBranch = null;
+    let hearts = [];
     let heartSpawned = false;
+    let interactiveFallingHearts = [];
 
-    // Pastel pink trunk and branch color matching reference video style
     const treeColor = "#ffb6c1";
+
+    // Helper to draw true geometric heart shapes matching the video
+    function drawHeartShape(x, y, size, color) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(size / 12, size / 12);
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(0, 3);
+        ctx.bezierCurveTo(-5, -3, -12, 2, -6, 9);
+        ctx.bezierCurveTo(-3, 12, 0, 14, 0, 15);
+        ctx.bezierCurveTo(0, 14, 3, 12, 6, 9);
+        ctx.bezierCurveTo(12, 2, 5, -3, 0, 3);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+    }
 
     class Branch {
         constructor(x, y, length, angle, thickness, gen) {
@@ -127,9 +143,7 @@ function startExactVideoReplication() {
         }
     }
 
-    let rootBranch = null;
-
-    class MultiColorHeartBlossom {
+    class TreeHeart {
         constructor(startX, startY, targetX, targetY) {
             this.x = startX;
             this.y = startY;
@@ -138,11 +152,11 @@ function startExactVideoReplication() {
             this.cx = startX;
             this.cy = startY;
             this.progress = 0;
-            this.speed = Math.random() * 0.035 + 0.02;
-            this.size = Math.random() * 4 + 2;
-            // Vibrant mix of warm pinks, reds, yellows, and oranges matching reference video
+            this.speed = Math.random() * 0.035 + 0.025;
+            this.size = Math.random() * 4 + 7; // Heart sizing matching video canopy
+            
             const hues = [340, 350, 15, 30, 45, 320];
-            this.color = `hsl(${hues[Math.floor(Math.random() * hues.length)]}, 100%, 65%)`;
+            this.color = `hsl(${hues[Math.floor(Math.random() * hues.length)]}, 100%, 70%)`;
         }
 
         update() {
@@ -154,32 +168,69 @@ function startExactVideoReplication() {
         }
 
         draw() {
-            ctx.fillStyle = this.color;
-            ctx.beginPath();
-            ctx.arc(this.cx, this.cy, this.size, 0, Math.PI * 2);
-            ctx.fill();
+            drawHeartShape(this.cx, this.cy, this.size, this.color);
+        }
+    }
+
+    // Interactive Falling Heart Class triggered when clicking the tree/hearts
+    class FallingHeart {
+        constructor(x, y, color) {
+            this.x = x;
+            this.y = y;
+            this.vx = (Math.random() - 0.5) * 3;
+            this.vy = Math.random() * 2 + 2;
+            this.size = 11;
+            this.color = color;
+            this.rotation = Math.random() * Math.PI;
+            this.vRot = (Math.random() - 0.5) * 0.05;
+        }
+
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.vy += 0.15; // Gravity acceleration
+            this.rotation += this.vRot;
+        }
+
+        draw() {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.rotation);
+            drawHeartShape(0, 0, this.size, this.color);
+            ctx.restore();
         }
     }
 
     let heartTargets = [];
-    for (let i = 0; i < 600; i++) {
-        let t = (i / 600) * Math.PI * 2;
+    for (let i = 0; i < 450; i++) {
+        let t = (i / 450) * Math.PI * 2;
         let x = 16 * Math.pow(Math.sin(t), 3);
         let y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
         let fillFactor = Math.random();
         heartTargets.push({
-            x: width / 2 + x * 12 * Math.sqrt(fillFactor),
-            y: (groundY - targetTrunkHeight - 110) + y * 12 * Math.sqrt(fillFactor)
+            x: width / 2 + x * 11 * Math.sqrt(fillFactor),
+            y: (groundY - targetTrunkHeight - 110) + y * 11 * Math.sqrt(fillFactor)
         });
     }
 
-    let frameCount = 0;
+    // Click canvas listener to make hearts detach and fall down like in the reference video
+    canvas.addEventListener('click', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+
+        // Spawn a cascade of falling hearts from the canopy on click
+        for (let i = 0; i < 15; i++) {
+            let sourceHeart = hearts.length > 0 ? hearts[Math.floor(Math.random() * hearts.length)] : {cx: clickX, cy: clickY, color: '#ffb6c1'};
+            interactiveFallingHearts.push(new FallingHeart(sourceHeart.cx, sourceHeart.cy, sourceHeart.color));
+        }
+    });
 
     function animate() {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
         ctx.fillRect(0, 0, width, height);
 
-        // Draw ground baseline matching video
+        // Ground baseline
         ctx.strokeStyle = "#ffffff";
         ctx.lineWidth = 2;
         ctx.beginPath();
@@ -188,7 +239,6 @@ function startExactVideoReplication() {
         ctx.stroke();
 
         if (state === 'FALLING_DOT') {
-            // Glowing falling dot sequence
             ctx.fillStyle = "#ffb6c1";
             ctx.shadowBlur = 15;
             ctx.shadowColor = "#ffb6c1";
@@ -203,7 +253,6 @@ function startExactVideoReplication() {
             }
         } 
         else if (state === 'GROWING_TRUNK') {
-            // Growing vertical trunk line
             if (trunkHeight < targetTrunkHeight) {
                 trunkHeight += 4;
             } else {
@@ -220,7 +269,6 @@ function startExactVideoReplication() {
             ctx.stroke();
         } 
         else if (state === 'BRANCHING') {
-            // Draw trunk
             ctx.strokeStyle = treeColor;
             ctx.lineWidth = trunkWidth;
             ctx.lineCap = "round";
@@ -239,13 +287,22 @@ function startExactVideoReplication() {
 
                 heartTargets.forEach(target => {
                     let src = terminals.length > 0 ? terminals[Math.floor(Math.random() * terminals.length)] : { x: width / 2, y: groundY - targetTrunkHeight };
-                    blossoms.push(new MultiColorHeartBlossom(src.x, src.y, target.x, target.y));
+                    hearts.push(new TreeHeart(src.x, src.y, target.x, target.y));
                 });
             }
 
-            blossoms.forEach(b => {
-                b.update();
-                b.draw();
+            hearts.forEach(h => {
+                h.update();
+                h.draw();
+            });
+
+            // Update & render interactive falling hearts
+            interactiveFallingHearts.forEach((fh, index) => {
+                fh.update();
+                fh.draw();
+                if (fh.y > height + 50) {
+                    interactiveFallingHearts.splice(index, 1);
+                }
             });
         }
 
@@ -253,7 +310,7 @@ function startExactVideoReplication() {
     }
     animate();
 
-    // Typewriter greeting messages sequence matching the video text progression
+    // Typewriter text progression sequence matching video timing
     const loveMessage = document.getElementById('loveMessage');
     const messages = [
         "hey you :)",
