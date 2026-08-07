@@ -10,7 +10,6 @@ const audioElement = document.getElementById('myAudio');
 
 const CORRECT_PASSWORD = "123";
 
-// Lamp pull chain interaction (Unchanged)
 chainToggle.addEventListener('click', () => {
     chainToggle.classList.add('pull');
     setTimeout(() => {
@@ -21,7 +20,6 @@ chainToggle.addEventListener('click', () => {
     loginCard.classList.toggle('active');
 });
 
-// Password confirmation and triggering exact video tree growth animation
 loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
     if (passwordInput.value === CORRECT_PASSWORD) {
@@ -34,15 +32,15 @@ loginForm.addEventListener('submit', (e) => {
             audioElement.play().catch(err => console.log("Audio autoplay prevented:", err));
         }
 
-        startVideoTreeAnimation();
+        startFullyFilledTreeAnimation();
     } else {
         alert("Incorrect password! Try again.");
         passwordInput.value = "";
     }
 });
 
-// Accurate implementation of the blossoming tree & blooming heart bloom sequence seen in the reference video
-function startVideoTreeAnimation() {
+// Fully filled blooming tree and dense heart blossom animation matching the reference video
+function startFullyFilledTreeAnimation() {
     const canvas = document.getElementById('treeCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -54,10 +52,8 @@ function startVideoTreeAnimation() {
         height = canvas.height = window.innerHeight;
     });
 
-    // Branch growth and blossom particle simulation
     let branches = [];
     let blossoms = [];
-    let animProgress = 0;
 
     class Branch {
         constructor(x, y, length, angle, thickness, generation) {
@@ -74,16 +70,16 @@ function startVideoTreeAnimation() {
 
         update() {
             if (this.progress < 1) {
-                this.progress += 0.03;
-            } else if (!this.hasCreatedChildren && this.generation < 5) {
+                this.progress += 0.035;
+            } else if (!this.hasCreatedChildren && this.generation < 6) {
                 this.hasCreatedChildren = true;
                 let endX = this.x + Math.cos(this.angle) * this.length;
                 let endY = this.y + Math.sin(this.angle) * this.length;
 
-                let leftAngle = this.angle - 0.45;
-                let rightAngle = this.angle + 0.45;
-                this.children.push(new Branch(endX, endY, this.length * 0.75, leftAngle, this.thickness * 0.7, this.generation + 1));
-                this.children.push(new Branch(endX, endY, this.length * 0.75, rightAngle, this.thickness * 0.7, this.generation + 1));
+                let leftAngle = this.angle - 0.42;
+                let rightAngle = this.angle + 0.42;
+                this.children.push(new Branch(endX, endY, this.length * 0.78, leftAngle, this.thickness * 0.7, this.generation + 1));
+                this.children.push(new Branch(endX, endY, this.length * 0.78, rightAngle, this.thickness * 0.7, this.generation + 1));
             }
 
             this.children.forEach(child => child.update());
@@ -104,84 +100,97 @@ function startVideoTreeAnimation() {
 
             this.children.forEach(child => child.draw());
         }
+
+        getTerminalPoints(list) {
+            let endX = this.x + Math.cos(this.angle) * this.length;
+            let endY = this.y + Math.sin(this.angle) * this.length;
+            if (this.children.length === 0) {
+                list.push({ x: endX, y: endY });
+            } else {
+                this.children.forEach(child => child.getTerminalPoints(list));
+            }
+        }
     }
 
-    // Initialize root tree position near bottom center
-    let rootTree = new Branch(width / 2, height - 80, 110, -Math.PI / 2, 9, 1);
+    let rootTree = new Branch(width / 2, height - 80, 115, -Math.PI / 2, 9, 1);
 
-    class HeartParticle {
-        constructor(x, y) {
+    class BlossomParticle {
+        constructor(x, y, targetX, targetY) {
             this.x = x;
             this.y = y;
-            this.size = Math.random() * 3.5 + 1.5;
-            this.color = `hsl(${Math.random() * 30 + 330}, 100%, ${Math.random() * 30 + 60}%)`;
-            this.vx = (Math.random() - 0.5) * 1.5;
-            this.vy = (Math.random() - 0.5) * 1.5 - 0.5;
-            this.life = 1;
-            this.decay = Math.random() * 0.015 + 0.005;
+            this.targetX = targetX;
+            this.targetY = targetY;
+            this.currentX = x;
+            this.currentY = y;
+            this.progress = 0;
+            this.speed = Math.random() * 0.04 + 0.02;
+            this.size = Math.random() * 2.5 + 1.2;
+            this.color = `hsl(${Math.random() * 25 + 335}, 100%, ${Math.random() * 35 + 55}%)`;
         }
+
         update() {
-            this.x += this.vx;
-            this.y += this.vy;
-            this.life -= this.decay;
+            if (this.progress < 1) {
+                this.progress += this.speed;
+                this.currentX = this.currentX + (this.targetX - this.currentX) * 0.1;
+                this.currentY = this.currentY + (this.targetY - this.currentY) * 0.1;
+            }
         }
+
         draw() {
-            ctx.save();
-            ctx.globalAlpha = Math.max(this.life, 0);
             ctx.fillStyle = this.color;
             ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.arc(this.currentX, this.currentY, this.size, 0, Math.PI * 2);
             ctx.fill();
-            ctx.restore();
         }
     }
 
-    // Heart Math generator for the crown
-    function getHeartCoords(t, scale) {
+    // Generate heavy heart contour coordinate targets
+    let heartTargets = [];
+    for (let i = 0; i < 700; i++) {
+        let t = (i / 700) * Math.PI * 2;
         let x = 16 * Math.pow(Math.sin(t), 3);
         let y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
-        return {
-            x: width / 2 + x * scale,
-            y: (height / 2 - 60) + y * scale
-        };
-    }
-
-    let heartPoints = [];
-    for (let i = 0; i < 250; i++) {
-        let t = (i / 250) * Math.PI * 2;
-        heartPoints.push(getHeartCoords(t, 13));
+        
+        // Fill both outline and interior volume of the heart to make it dense and fully filled
+        let internalFactor = Math.random();
+        heartTargets.push({
+            x: width / 2 + x * 14 * Math.sqrt(internalFactor),
+            y: (height / 2 - 65) + y * 14 * Math.sqrt(internalFactor)
+        });
     }
 
     let frame = 0;
+    let blossomsSpawned = false;
+
     function loop() {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
         ctx.fillRect(0, 0, width, height);
 
         rootTree.update();
         rootTree.draw();
 
         frame++;
-        if (frame > 80) {
-            // Spawn heart cluster blossoms matching video reference
-            for (let i = 0; i < 4; i++) {
-                let pt = heartPoints[Math.floor(Math.random() * heartPoints.length)];
-                blossoms.push(new HeartParticle(pt.x + (Math.random() - 0.5) * 15, pt.y + (Math.random() - 0.5) * 15));
-            }
+        if (frame > 90 && !blossomsSpawned) {
+            blossomsSpawned = true;
+            let terminals = [];
+            rootTree.getTerminalPoints(terminals);
+
+            // Emit dense flowers from branch tips to fill the entire heart shape fully
+            heartTargets.forEach(target => {
+                let source = terminals.length > 0 ? terminals[Math.floor(Math.random() * terminals.length)] : { x: width / 2, y: height / 2 };
+                blossoms.push(new BlossomParticle(source.x, source.y, target.x, target.y));
+            });
         }
 
-        blossoms.forEach((b, index) => {
+        blossoms.forEach(b => {
             b.update();
             b.draw();
-            if (b.life <= 0) {
-                blossoms.splice(index, 1);
-            }
         });
 
         requestAnimationFrame(loop);
     }
     loop();
 
-    // Typewriter greeting messages corresponding to the reference animation sequence
     const loveMessage = document.getElementById('loveMessage');
     const messages = [
         "Hey, you :)<br>Happy Birthday!",
