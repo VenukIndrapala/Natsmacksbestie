@@ -75,9 +75,8 @@ function startExactTreeGrowth(btnX, btnY) {
     const treeScale = 0.95; 
     const trunkElongation = 45;
 
-    // --- Added: tree slide-to-the-right + hearts falling out of the canopy ---
+    // --- Tree offset locked to 0 to prevent moving to the right ---
     let treeOffsetX = 0;
-    const targetOffsetX = width * 0.25;
     let movingStarted = false;
     let fallingHearts = [];
 
@@ -131,7 +130,6 @@ function startExactTreeGrowth(btnX, btnY) {
         }
     }
 
-    // Updated palette: Removed the dark brown to keep it bright and colorful
     const heartColors = [
         '#FFDA03', // Sunflower Yellow
         '#FF6800', // Fiery Tangerine
@@ -186,7 +184,6 @@ function startExactTreeGrowth(btnX, btnY) {
         }
     }
 
-    // Added: particle that detaches from the canopy and falls/flutters down
     class FallingHeart {
         constructor(x, y, color) {
             this.x = x;
@@ -244,7 +241,7 @@ function startExactTreeGrowth(btnX, btnY) {
 
     let branches = [];
     let hearts = [];
-    const MAX_HEARTS = 900; // Increased to make the heart much fuller
+    const MAX_HEARTS = 900;
 
     function setupBranches() {
         branches.push(new CubicBranch(0, 0, 0, -60, -2, -120, -3, -175, 24, 10, 0));
@@ -313,7 +310,6 @@ function startExactTreeGrowth(btnX, btnY) {
 
             if (state === 'SPAWNING_HEARTS') {
                 if (hearts.length < MAX_HEARTS) {
-                    // Increased from 4 to 8 spawns per frame to match the new higher max amount smoothly
                     for (let i = 0; i < 8; i++) {
                         if (hearts.length < MAX_HEARTS) {
                             let canopyCenterY = groundY - (250 * treeScale);
@@ -324,9 +320,6 @@ function startExactTreeGrowth(btnX, btnY) {
                         }
                     }
                 } else {
-                    // Added: once the canopy is full, start sliding the tree
-                    // right (smoothly eased, not a cut) and begin shedding
-                    // falling hearts from the canopy.
                     movingStarted = true;
                 }
 
@@ -336,8 +329,8 @@ function startExactTreeGrowth(btnX, btnY) {
                 });
 
                 if (movingStarted) {
-                    treeOffsetX += (targetOffsetX - treeOffsetX) * 0.035;
-
+                    // treeOffsetX is kept at 0 so movement doesn't occur, 
+                    // but falling hearts from the canopy continue smoothly.
                     if (hearts.length > 0 && Math.random() < 0.6) {
                         let source = hearts[Math.floor(Math.random() * hearts.length)];
                         fallingHearts.push(new FallingHeart(source.x + treeOffsetX, source.y, source.color));
@@ -360,7 +353,6 @@ function startExactTreeGrowth(btnX, btnY) {
     animate();
 }
 
-// --- Added: typewriter love message shown above the tree ---
 const loveMessageFull = `Hey Natti, 
 So this was meant for bestie clearly, but I just felt like I should annoy her now even though I’ll probably be sending this at 2am in the morning and she’s definitely going to be rebooting when she reads this, she’s going to see the tree and go “meh mokada meh pissu” XD. But just wanted to come here and say that you’ve had quite the hectic week and you haven’t been feeling that great and honestly you are genuinely doing an amazing job hanging in there that strong with everything that’s going on and I couldn’t be more proud of you, you can give some of that to the rest of the world don’t gate keep thanks ._. And now bestie is supposed to come today but I think even bestie is depressed and even she doesn’t want to say hello. And even if she does I know you’ll be knocking her out in seconds cause you are just strong independent and really cool like that VERY SLAY GURL. I’m sure she’s reading this like “ugh there’s more to this paragraph” so guess what I’m going to do I’m going to keep dragging this sentence out like this where I’m just typing the word typing for the funsies of typing so you’ll have to read all of this and there’s literally no point in reading this cause this is just pure rage baiting :p but if you made it this far and ur still here, miss you ma’am and by miss I mean I mean properly hanging out with you without having to be cautious this much and all stressed I really miss that, but hopefully with locking in and praying triples and quadruples things will be better and I can finally have my missing rib guys thanks :) so yeah stay strong stay happy and always keep that beautiful smile of yours with you don’t ever loose it okay and like always if there’s anything you want to talk about I am here to talk and make it worse :D (if you made it this far early in the morning I’m genuinely impressed and I’ll see you at yf Ma’am, I’m going to do a hand sign when I see you today just know that’s me saying you look really beautiful today cause I can’t say it out loud so yeah see you then)`;
 
@@ -368,14 +360,11 @@ function startLoveTypewriter() {
     const box = document.getElementById('loveTextBox');
     if (!box) return;
 
-    // --- Added line to explicitly make text italic ---
     box.style.fontStyle = 'italic'; 
 
     let charIndex = 0;
     let pageText = '';
     const typingSpeed = 26;
-    
-    // --- Increased from 900 to 1900 (+1 second) ---
     const pageBreakPause = 1900; 
 
     function typeNext() {
@@ -386,9 +375,6 @@ function startLoveTypewriter() {
         box.textContent = pageText;
 
         if (box.scrollHeight > box.clientHeight) {
-            // This character overflowed the space available above the tree.
-            // Back it out, briefly pause, then clear and start a fresh page
-            // continuing from that same character.
             pageText = pageText.slice(0, -1);
             box.textContent = pageText;
 
