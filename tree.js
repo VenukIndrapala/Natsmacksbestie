@@ -49,6 +49,7 @@ clickPrompt.addEventListener('click', (e) => {
     }, 400);
 });
 
+// --- Final Tree & Heart Animation Logic ---
 function startExactTreeGrowth(btnX, btnY) {
     const canvas = document.getElementById('treeCanvas');
     const ctx = canvas.getContext('2d');
@@ -67,19 +68,27 @@ function startExactTreeGrowth(btnX, btnY) {
     let dotY = btnY;
     
     let targetGroundX = width / 2;
-    let groundY = height - 120;
+    let groundY = height - 100; // Lowered slightly to ensure canopy room
     const trunkColor = "#864B24"; 
+
+    // Global scale and offset to optimize for mobile screens
+    const treeScale = 0.95; 
+    const trunkElongation = 45;
 
     class CubicBranch {
         constructor(sx, sy, cp1x, cp1y, cp2x, cp2y, ex, ey, w0, w1, delay) {
-            const scale = 1.35; 
-            
-            this.p0 = { x: sx * scale, y: sy * scale };
-            this.p1 = { x: cp1x * scale, y: cp1y * scale };
-            this.p2 = { x: cp2x * scale, y: cp2y * scale };
-            this.p3 = { x: ex * scale, y: ey * scale };
-            this.w0 = w0 * scale;
-            this.w1 = w1 * scale;
+            // Apply elongation to make the trunk longer and shift canopy up
+            let sy_adj = sy === 0 ? 0 : sy - trunkElongation;
+            let cp1y_adj = sy === 0 ? cp1y - (trunkElongation/2) : cp1y - trunkElongation;
+            let cp2y_adj = cp2y - trunkElongation;
+            let ey_adj = ey - trunkElongation;
+
+            this.p0 = { x: sx * treeScale, y: sy_adj * treeScale };
+            this.p1 = { x: cp1x * treeScale, y: cp1y_adj * treeScale };
+            this.p2 = { x: cp2x * treeScale, y: cp2y_adj * treeScale };
+            this.p3 = { x: ex * treeScale, y: ey_adj * treeScale };
+            this.w0 = w0 * treeScale;
+            this.w1 = w1 * treeScale;
             this.delay = delay;
             this.progress = 0;
             this.speed = 0.012; 
@@ -117,37 +126,85 @@ function startExactTreeGrowth(btnX, btnY) {
         }
     }
 
+    // --- Heart Particle System ---
+    const heartColors = ['#ff4d6d', '#ff758f', '#ff8fa3', '#c9184a', '#a01a58', '#d81b60', '#e5383b'];
+
+    class HeartParticle {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.size = Math.random() * 5 + 4.5; // Random size
+            this.color = heartColors[Math.floor(Math.random() * heartColors.length)];
+            this.angle = (Math.random() - 0.5) * 0.4; // Slight tilt
+            this.flutterSpeed = Math.random() * 0.03 + 0.015;
+            this.flutterOffset = Math.random() * Math.PI * 2;
+            this.scale = 0; 
+            this.targetScale = Math.random() * 0.4 + 0.8; 
+        }
+
+        update() {
+            if (this.scale < this.targetScale) {
+                this.scale += 0.06; // Pop-in speed
+            }
+        }
+
+        draw(ctx) {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            
+            // Add a subtle flutter effect once fully grown
+            let currentScale = this.scale;
+            if (this.scale >= this.targetScale) {
+                currentScale += Math.sin(Date.now() * this.flutterSpeed + this.flutterOffset) * 0.08;
+            }
+            
+            ctx.scale(currentScale, currentScale);
+            ctx.rotate(this.angle);
+            ctx.fillStyle = this.color;
+            
+            // Draw exact bezier heart shape
+            ctx.beginPath();
+            let top = -this.size * 0.3;
+            ctx.moveTo(0, top);
+            ctx.bezierCurveTo(-this.size, -this.size, -this.size * 1.5, this.size / 3, 0, this.size);
+            ctx.bezierCurveTo(this.size * 1.5, this.size / 3, this.size, -this.size, 0, top);
+            ctx.fill();
+            
+            ctx.restore();
+        }
+    }
+
+    // Math function to constrain points inside a perfect heart shape
+    function getHeartPoint(centerX, centerY, radius) {
+        while (true) {
+            let nx = (Math.random() * 2.4) - 1.2;
+            let ny = (Math.random() * 2.4) - 1.2;
+            
+            // Heart mathematical equation: (x^2 + y^2 - 1)^3 - x^2 * y^3 <= 0
+            let val = Math.pow(nx*nx + ny*ny - 1, 3) - (nx*nx * Math.pow(ny, 3));
+            if (val <= 0) {
+                return { 
+                    x: centerX + nx * radius, 
+                    y: centerY - ny * radius // Flipped because canvas Y goes down
+                };
+            }
+        }
+    }
+
     let branches = [];
+    let hearts = [];
+    const MAX_HEARTS = 450; 
 
     function setupBranches() {
-        // Trunk, ending at the crown fork point (-3,-175)
         branches.push(new CubicBranch(0, 0, 0, -60, -2, -120, -3, -175, 24, 10, 0));
-
-        // --- Bottom branches: only two now (lower-left and upper-right),
-        // clearly different sizes for a more natural look, tips angled
-        // upward at 45 degrees.
-
-        // Lower-left (larger)
         branches.push(new CubicBranch(-2, -88, -25, -114, -92, -100, -118, -126, 6, 0.1, 12));
-
-        // Upper-right (smaller)
         branches.push(new CubicBranch(-1.7, -117, 18, -136, 48, -128, 70, -150, 3.4, 0.1, 40));
-
-        // --- Top three branches: asymmetric heights + more pronounced
-        // curve, matching the reference (center tallest, left second,
-        // right shortest).
-
-        // Left branch -- tall, pronounced S-curve, small forked twig near the tip
         branches.push(new CubicBranch(-3, -175, -30, -206, -55, -246, -63, -276, 7, 2.4, 55));
         branches.push(new CubicBranch(-63, -276, -76, -288, -85, -298, -92, -306, 2.4, 0.1, 78));
         branches.push(new CubicBranch(-63, -276, -66, -290, -68, -302, -70, -313, 2.4, 0.1, 78));
-
-        // Right branch -- shorter than left, gentler curve, small twig near the tip
         branches.push(new CubicBranch(-3, -175, 24, -197, 41, -217, 47, -234, 7, 2.4, 55));
         branches.push(new CubicBranch(47, -234, 59, -246, 68, -257, 75, -266, 2.4, 0.1, 78));
         branches.push(new CubicBranch(47, -234, 51, -248, 54, -260, 56, -271, 2.4, 0.1, 78));
-
-        // Center -- tallest, reaches the top, splits into a tight V at the very tip
         branches.push(new CubicBranch(-3, -175, -2, -213, 3, -252, 6, -288, 5.2, 0.1, 55));
         branches.push(new CubicBranch(5, -266, -1, -280, -5, -294, -11, -306, 1.8, 0.1, 80));
         branches.push(new CubicBranch(5, -266, 10, -280, 15, -294, 19, -304, 1.8, 0.1, 80));
@@ -163,6 +220,7 @@ function startExactTreeGrowth(btnX, btnY) {
     function animate() {
         ctx.clearRect(0, 0, width, height);
 
+        // Ground line
         ctx.strokeStyle = "#1a1a1a";
         ctx.lineWidth = 2;
         ctx.beginPath();
@@ -184,18 +242,47 @@ function startExactTreeGrowth(btnX, btnY) {
                 setupBranches(); 
             }
         } 
-        else if (state === 'GROWING_TREE') {
+        else if (state === 'GROWING_TREE' || state === 'SPAWNING_HEARTS') {
             ctx.save();
             ctx.beginPath();
             ctx.rect(0, 0, width, groundY - 1); 
             ctx.clip();
 
+            let allGrown = true;
             branches.forEach(branch => {
                 branch.update();
                 branch.draw(ctx, targetGroundX, groundY);
+                if (branch.progress < 1) allGrown = false;
             });
 
             ctx.restore();
+
+            // Transition to spawning hearts once branches finish
+            if (allGrown && state === 'GROWING_TREE') {
+                state = 'SPAWNING_HEARTS';
+            }
+
+            if (state === 'SPAWNING_HEARTS') {
+                // Spawn multiple hearts per frame until max is reached
+                if (hearts.length < MAX_HEARTS) {
+                    for (let i = 0; i < 4; i++) {
+                        if (hearts.length < MAX_HEARTS) {
+                            // Calculate center of canopy dynamically based on scale
+                            let canopyCenterY = groundY - (250 * treeScale);
+                            let heartRadius = 150 * treeScale;
+                            
+                            let pt = getHeartPoint(targetGroundX, canopyCenterY, heartRadius);
+                            hearts.push(new HeartParticle(pt.x, pt.y));
+                        }
+                    }
+                }
+
+                // Draw and update all active hearts
+                hearts.forEach(h => {
+                    h.update();
+                    h.draw(ctx);
+                });
+            }
         }
 
         requestAnimationFrame(animate);
