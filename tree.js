@@ -74,6 +74,12 @@ function startExactTreeGrowth(btnX, btnY) {
     const treeScale = 0.95; 
     const trunkElongation = 45;
 
+    // --- Added: tree slide-to-the-right + hearts falling out of the canopy ---
+    let treeOffsetX = 0;
+    const targetOffsetX = width * 0.25;
+    let movingStarted = false;
+    let fallingHearts = [];
+
     class CubicBranch {
         constructor(sx, sy, cp1x, cp1y, cp2x, cp2y, ex, ey, w0, w1, delay) {
             let sy_adj = sy === 0 ? 0 : sy - trunkElongation;
@@ -154,9 +160,10 @@ function startExactTreeGrowth(btnX, btnY) {
             }
         }
 
-        draw(ctx) {
+        draw(ctx, offsetX) {
+            offsetX = offsetX || 0;
             ctx.save();
-            ctx.translate(this.x, this.y);
+            ctx.translate(this.x + offsetX, this.y);
             
             let currentScale = this.scale;
             if (this.scale >= this.targetScale) {
@@ -174,6 +181,47 @@ function startExactTreeGrowth(btnX, btnY) {
             ctx.bezierCurveTo(this.size * 1.5, this.size / 3, this.size, -this.size, 0, top);
             ctx.fill();
             
+            ctx.restore();
+        }
+    }
+
+    // Added: particle that detaches from the canopy and falls/flutters down
+    class FallingHeart {
+        constructor(x, y, color) {
+            this.x = x;
+            this.y = y;
+            this.size = Math.random() * 4.5 + 4;
+            this.color = color;
+            this.vx = -(Math.random() * 1.1 + 0.3);
+            this.vy = Math.random() * 0.6 + 0.4;
+            this.gravity = 0.045;
+            this.angle = Math.random() * Math.PI * 2;
+            this.vRot = (Math.random() - 0.5) * 0.05;
+            this.flutterSpeed = Math.random() * 0.05 + 0.02;
+            this.flutterOffset = Math.random() * Math.PI * 2;
+            this.life = 1;
+        }
+
+        update() {
+            this.vy += this.gravity;
+            this.x += this.vx + Math.sin(Date.now() * this.flutterSpeed + this.flutterOffset) * 0.6;
+            this.y += this.vy;
+            this.angle += this.vRot;
+        }
+
+        draw(ctx) {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.angle);
+            ctx.fillStyle = this.color;
+
+            ctx.beginPath();
+            let top = -this.size * 0.3;
+            ctx.moveTo(0, top);
+            ctx.bezierCurveTo(-this.size, -this.size, -this.size * 1.5, this.size / 3, 0, this.size);
+            ctx.bezierCurveTo(this.size * 1.5, this.size / 3, this.size, -this.size, 0, top);
+            ctx.fill();
+
             ctx.restore();
         }
     }
@@ -252,7 +300,7 @@ function startExactTreeGrowth(btnX, btnY) {
             let allGrown = true;
             branches.forEach(branch => {
                 branch.update();
-                branch.draw(ctx, targetGroundX, groundY);
+                branch.draw(ctx, targetGroundX + treeOffsetX, groundY);
                 if (branch.progress < 1) allGrown = false;
             });
 
@@ -274,12 +322,35 @@ function startExactTreeGrowth(btnX, btnY) {
                             hearts.push(new HeartParticle(pt.x, pt.y));
                         }
                     }
+                } else {
+                    // Added: once the canopy is full, start sliding the tree
+                    // right (smoothly eased, not a cut) and begin shedding
+                    // falling hearts from the canopy.
+                    movingStarted = true;
                 }
 
                 hearts.forEach(h => {
                     h.update();
-                    h.draw(ctx);
+                    h.draw(ctx, treeOffsetX);
                 });
+
+                if (movingStarted) {
+                    treeOffsetX += (targetOffsetX - treeOffsetX) * 0.035;
+
+                    if (hearts.length > 0 && Math.random() < 0.6) {
+                        let source = hearts[Math.floor(Math.random() * hearts.length)];
+                        fallingHearts.push(new FallingHeart(source.x + treeOffsetX, source.y, source.color));
+                    }
+
+                    for (let i = fallingHearts.length - 1; i >= 0; i--) {
+                        let fh = fallingHearts[i];
+                        fh.update();
+                        fh.draw(ctx);
+                        if (fh.y > groundY + 30 || fh.x < -30) {
+                            fallingHearts.splice(i, 1);
+                        }
+                    }
+                }
             }
         }
 
