@@ -123,21 +123,15 @@ function startExactTreeGrowth(btnX, btnY) {
         // Trunk, ending at the crown fork point (-3,-175)
         branches.push(new CubicBranch(0, 0, 0, -60, -2, -120, -3, -175, 24, 10, 0));
 
-        // --- Bottom four branches: sharp upward curve right at the trunk,
-        // then straightening out toward the tip, angled upward overall
-        // (no droop), spaced further apart so they don't cross each other.
+        // --- Bottom branches: only two now (lower-left and upper-right),
+        // clearly different sizes for a more natural look, tips angled
+        // upward at 45 degrees.
 
-        // Lower-left (longest, starts lowest of the pair)
-        branches.push(new CubicBranch(-1, -88, -25, -114, -70, -107, -120, -111, 6, 0.1, 12));
+        // Lower-left (larger)
+        branches.push(new CubicBranch(-1, -88, -25, -114, -92, -100, -118, -126, 6, 0.1, 12));
 
-        // Lower-right (shorter than lower-left)
-        branches.push(new CubicBranch(-1, -83, 22, -107, 58, -99, 92, -102, 5.2, 0.1, 18));
-
-        // Upper-left (starts higher on the trunk, clear of the lower-left branch)
-        branches.push(new CubicBranch(-1.5, -122, -20, -142, -52, -136, -82, -140, 4.4, 0.1, 32));
-
-        // Upper-right (shortest of the four)
-        branches.push(new CubicBranch(-1.7, -117, 18, -136, 46, -131, 70, -134, 4, 0.1, 40));
+        // Upper-right (smaller)
+        branches.push(new CubicBranch(-1.7, -117, 18, -136, 48, -128, 70, -150, 3.4, 0.1, 40));
 
         // --- Top three branches: asymmetric heights + more pronounced
         // curve, matching the reference (center tallest, left second,
