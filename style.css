@@ -300,38 +300,18 @@ body.active .lamp-glow {
     font-weight: 400;
 }
 
-.pulse-heart {
-    width: 20px;
-    height: 20px;
-    background-color: #e91e63;
-    transform: rotate(45deg);
-    position: relative;
-    animation: heartBeat 1.2s infinite;
-}
-
-.pulse-heart::before,
-.pulse-heart::after {
-    content: '';
-    width: 20px;
-    height: 20px;
+.pulse-circle {
+    width: 24px;
+    height: 24px;
     background-color: #e91e63;
     border-radius: 50%;
-    position: absolute;
+    position: relative;
+    animation: circleBeat 1.2s infinite;
 }
 
-.pulse-heart::before {
-    top: -10px;
-    left: 0;
-}
-
-.pulse-heart::after {
-    top: 0;
-    left: -10px;
-}
-
-@keyframes heartBeat {
-    0%, 100% { transform: rotate(45deg) scale(1); }
-    50% { transform: rotate(45deg) scale(1.25); }
+@keyframes circleBeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.25); }
 }
 
 @keyframes promptFloat {
