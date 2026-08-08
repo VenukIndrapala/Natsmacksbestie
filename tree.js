@@ -123,34 +123,40 @@ function startExactTreeGrowth(btnX, btnY) {
         // Trunk, ending at the crown fork point (-3,-175)
         branches.push(new CubicBranch(0, 0, 0, -60, -2, -120, -3, -175, 24, 10, 0));
 
-        // Lowest branch (left) -- stays low so it never crosses the mid-left branch above it
-        branches.push(new CubicBranch(-0.55, -59.2, -35, -62, -75, -60, -100, -72, 6, 0.1, 12));
+        // --- Bottom four branches: droop down first, then hook upward at
+        // the tip, matching the reference image's curve instead of straight
+        // diagonal lines. Lower pair reaches further out than the upper pair.
 
-        // Lower branch (right), sweeps out and hooks upward at the tip
-        branches.push(new CubicBranch(-0.77, -71.7, 32, -76, 68, -78, 95, -90, 5.5, 0.1, 20));
+        // Lower-left (longest, starts lowest on the trunk)
+        branches.push(new CubicBranch(-1, -75, -42, -66, -88, -76, -124, -90, 6, 0.1, 12));
 
-        // Mid branch (left), gentle arc -- kept consistently above the lowest-left branch
-        branches.push(new CubicBranch(-1.3, -98.2, -38, -102, -75, -120, -105, -130, 4.5, 0.1, 35));
+        // Lower-right (shorter than lower-left)
+        branches.push(new CubicBranch(-1, -70, 34, -62, 70, -71, 94, -82, 5.2, 0.1, 18));
 
-        // Mid branch (right), gentle arc
-        branches.push(new CubicBranch(-1.7, -113.9, 38, -119, 78, -132, 105, -140, 4.2, 0.1, 42));
+        // Upper-left (shorter, starts higher on the trunk)
+        branches.push(new CubicBranch(-1.5, -101, -30, -106, -58, -98, -80, -107, 4.4, 0.1, 32));
 
-        // Crown -- left: a short stub from the fork point, splitting into two
-        // thin prongs near its end (matching the reference's forked tip)
-        branches.push(new CubicBranch(-3, -175, -28, -203, -45, -220, -55, -232, 8, 3, 55));
-        branches.push(new CubicBranch(-55, -232, -68, -245, -78, -257, -85, -267, 2.6, 0.1, 75));
-        branches.push(new CubicBranch(-55, -232, -60, -247, -64, -262, -66, -274, 2.6, 0.1, 75));
+        // Upper-right (shortest of the four)
+        branches.push(new CubicBranch(-1.7, -109, 28, -114, 55, -108, 76, -118, 4, 0.1, 40));
 
-        // Crown -- right: mirrored
-        branches.push(new CubicBranch(-3, -175, 22, -203, 40, -220, 51, -232, 8, 3, 55));
-        branches.push(new CubicBranch(51, -232, 63, -245, 73, -257, 80, -267, 2.6, 0.1, 75));
-        branches.push(new CubicBranch(51, -232, 56, -247, 60, -262, 62, -274, 2.6, 0.1, 75));
+        // --- Top three branches: asymmetric heights + more pronounced
+        // curve, matching the reference (center tallest, left second,
+        // right shortest).
 
-        // Crown -- center tip, continuing straight up from the fork point,
-        // itself splitting into two thin prongs near the very top
-        branches.push(new CubicBranch(-3, -175, -2, -212, 3, -250, 7, -283, 5, 0.1, 55));
-        branches.push(new CubicBranch(4.5, -262, -2, -276, -6, -290, -12, -302, 1.8, 0.1, 80));
-        branches.push(new CubicBranch(4.5, -262, 9, -276, 14, -290, 18, -300, 1.8, 0.1, 80));
+        // Left branch -- tall, pronounced S-curve, small forked twig near the tip
+        branches.push(new CubicBranch(-3, -175, -30, -206, -55, -246, -63, -276, 7, 2.4, 55));
+        branches.push(new CubicBranch(-63, -276, -76, -288, -85, -298, -92, -306, 2.4, 0.1, 78));
+        branches.push(new CubicBranch(-63, -276, -66, -290, -68, -302, -70, -313, 2.4, 0.1, 78));
+
+        // Right branch -- shorter than left, gentler curve, small twig near the tip
+        branches.push(new CubicBranch(-3, -175, 24, -197, 41, -217, 47, -234, 7, 2.4, 55));
+        branches.push(new CubicBranch(47, -234, 59, -246, 68, -257, 75, -266, 2.4, 0.1, 78));
+        branches.push(new CubicBranch(47, -234, 51, -248, 54, -260, 56, -271, 2.4, 0.1, 78));
+
+        // Center -- tallest, reaches the top, splits into a tight V at the very tip
+        branches.push(new CubicBranch(-3, -175, -2, -213, 3, -252, 6, -288, 5.2, 0.1, 55));
+        branches.push(new CubicBranch(5, -266, -1, -280, -5, -294, -11, -306, 1.8, 0.1, 80));
+        branches.push(new CubicBranch(5, -266, 10, -280, 15, -294, 19, -304, 1.8, 0.1, 80));
     }
 
     function drawDot(x, y, radius, color) {
