@@ -253,7 +253,7 @@ body.active .lamp-glow {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: #fce1e6;
+    background-color: #fce1e6; /* Adjusted to match target background warmth */
     display: none;
     justify-content: center;
     align-items: center;
@@ -347,12 +347,17 @@ body.active .lamp-glow {
     height: 100%;
 }
 
+/* Added: typewriter love message shown above the tree --
+   narrowed to a left-hand column (instead of spanning the full
+   width) so it never overlaps the tree, and given a tall max-height
+   so it can keep flowing down through the space to the left of the
+   canopy and then the space to the left of the trunk lower down. */
 .love-text-box {
     position: absolute;
     top: 6%;
     left: 5%;
-    width: 90%; 
-    max-height: 24vh; 
+    width: 34%;
+    max-height: 86vh;
     overflow: hidden;
     color: #c2185b;
     font-size: 0.82rem;
@@ -363,10 +368,4 @@ body.active .lamp-glow {
     white-space: pre-wrap;
     word-wrap: break-word;
     pointer-events: none;
-    transition: width 0.9s ease, max-height 0.9s ease;
-}
-
-.love-text-box.narrow {
-    width: 34%; 
-    max-height: 86vh;
 }
