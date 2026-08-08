@@ -128,7 +128,7 @@ function startExactTreeGrowth(btnX, btnY) {
         // upward at 45 degrees.
 
         // Lower-left (larger)
-        branches.push(new CubicBranch(-1, -88, -25, -114, -92, -100, -118, -126, 6, 0.1, 12));
+        branches.push(new CubicBranch(-2, -88, -25, -114, -92, -100, -118, -126, 6, 0.1, 12));
 
         // Upper-right (smaller)
         branches.push(new CubicBranch(-1.7, -117, 18, -136, 48, -128, 70, -150, 3.4, 0.1, 40));
