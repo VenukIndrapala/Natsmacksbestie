@@ -347,17 +347,16 @@ body.active .lamp-glow {
     height: 100%;
 }
 
-/* Added: typewriter love message shown above the tree --
-   narrowed to a left-hand column (instead of spanning the full
-   width) so it never overlaps the tree, and given a tall max-height
-   so it can keep flowing down through the space to the left of the
-   canopy and then the space to the left of the trunk lower down. */
+/* 
+   Typewriter text styling. Starts out wide for the space above the tree canopy,
+   and smoothly switches to narrow left-aligned via JS when overflowing.
+*/
 .love-text-box {
     position: absolute;
     top: 6%;
     left: 5%;
-    width: 34%;
-    max-height: 86vh;
+    width: 90%; /* Starts wide for the space above the tree */
+    max-height: 24vh; /* Keeps the first paragraph above the canopy */
     overflow: hidden;
     color: #c2185b;
     font-size: 0.82rem;
@@ -368,4 +367,10 @@ body.active .lamp-glow {
     white-space: pre-wrap;
     word-wrap: break-word;
     pointer-events: none;
+    transition: width 0.4s ease, max-height 0.4s ease;
+}
+
+.love-text-box.narrow {
+    width: 34%; 
+    max-height: 86vh;
 }
