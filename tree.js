@@ -124,7 +124,17 @@ function startExactTreeGrowth(btnX, btnY) {
         }
     }
 
-    const heartColors = ['#ff4d6d', '#ff758f', '#ff8fa3', '#c9184a', '#a01a58', '#d81b60', '#e5383b'];
+    // Updated with the new requested color palette
+    const heartColors = [
+        '#FFDA03', // Sunflower Yellow
+        '#FF6800', // Fiery Tangerine
+        '#FCAE1E', // Marigold
+        '#FF7F50', // Coral
+        '#F88379', // Coral-Pink
+        '#3D1C02', // Deep Chocolate Brown
+        '#FFFDD0', // Cream
+        '#FADADD'  // Blush
+    ];
 
     class HeartParticle {
         constructor(x, y) {
@@ -189,24 +199,15 @@ function startExactTreeGrowth(btnX, btnY) {
     const MAX_HEARTS = 450; 
 
     function setupBranches() {
-        // Trunk
         branches.push(new CubicBranch(0, 0, 0, -60, -2, -120, -3, -175, 24, 10, 0));
-        
-        // --- Bottom branches ---
-        // Lower-left (Adjusted tip to point upwards at ~45-degree angle)
         branches.push(new CubicBranch(-2, -88, -35, -114, -75, -145, -100, -188, 6, 0.1, 12));
-        // Upper-right
         branches.push(new CubicBranch(-1.7, -117, 18, -136, 48, -128, 70, -150, 3.4, 0.1, 40));
-        
-        // --- Top branches ---
         branches.push(new CubicBranch(-3, -175, -30, -206, -55, -246, -63, -276, 7, 2.4, 55));
         branches.push(new CubicBranch(-63, -276, -76, -288, -85, -298, -92, -306, 2.4, 0.1, 78));
         branches.push(new CubicBranch(-63, -276, -66, -290, -68, -302, -70, -313, 2.4, 0.1, 78));
-        
         branches.push(new CubicBranch(-3, -175, 24, -197, 41, -217, 47, -234, 7, 2.4, 55));
         branches.push(new CubicBranch(47, -234, 59, -246, 68, -257, 75, -266, 2.4, 0.1, 78));
         branches.push(new CubicBranch(47, -234, 51, -248, 54, -260, 56, -271, 2.4, 0.1, 78));
-        
         branches.push(new CubicBranch(-3, -175, -2, -213, 3, -252, 6, -288, 5.2, 0.1, 55));
         branches.push(new CubicBranch(5, -266, -1, -280, -5, -294, -11, -306, 1.8, 0.1, 80));
         branches.push(new CubicBranch(5, -266, 10, -280, 15, -294, 19, -304, 1.8, 0.1, 80));
