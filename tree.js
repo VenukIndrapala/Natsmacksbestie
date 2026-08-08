@@ -46,6 +46,7 @@ clickPrompt.addEventListener('click', (e) => {
     setTimeout(() => {
         clickPrompt.style.display = 'none';
         startExactTreeGrowth(startX, startY);
+        startLoveTypewriter();
     }, 400);
 });
 
@@ -357,4 +358,46 @@ function startExactTreeGrowth(btnX, btnY) {
         requestAnimationFrame(animate);
     }
     animate();
+}
+
+// --- Added: typewriter love message shown above the tree ---
+const loveMessageFull = `Hey Natti, 
+So this was meant for bestie clearly, but I just felt like I should annoy her now even though I’ll probably be sending this at 2am in the morning and she’s definitely going to be rebooting when she reads this, she’s going to see the tree and go “meh mokada meh pissu” XD. But just wanted to come here and say that you’ve had quite the hectic week and you haven’t been feeling that great and honestly you are genuinely doing an amazing job hanging in there that strong with everything that’s going on and I couldn’t be more proud of you, you can give some of that to the rest of the world don’t gate keep thanks ._. And now bestie is supposed to come today but I think even bestie is depressed and even she doesn’t want to say hello. And even if she does I know you’ll be knocking her out in seconds cause you are just strong independent and really cool like that VERY SLAY GURL. I’m sure she’s reading this like “ugh there’s more to this paragraph” so guess what I’m going to do I’m going to keep dragging this sentence out like this where I’m just typing the word typing for the funsies of typing so you’ll have to read all of this and there’s literally no point in reading this cause this is just pure rage baiting :p but if you made it this far and ur still here, miss you ma’am and by miss I mean I mean properly hanging out with you without having to be cautious this much and all stressed I really miss that, but hopefully with locking in and praying triples and quadruples things will be better and I can finally have my missing rib guys thanks :) so yeah stay strong stay happy and always keep that beautiful smile of yours with you don’t ever loose it okay and like always if there’s anything you want to talk about I am here to talk and make it worse :D (if you made it this far early in the morning I’m genuinely impressed and I’ll see you at yf Ma’am, I’m going to do a hand sign when I see you today just know that’s me saying you look really beautiful today cause I can’t say it out loud so yeah see you then)`;
+
+function startLoveTypewriter() {
+    const box = document.getElementById('loveTextBox');
+    if (!box) return;
+
+    let charIndex = 0;
+    let pageText = '';
+    const typingSpeed = 26;
+    const pageBreakPause = 900;
+
+    function typeNext() {
+        if (charIndex >= loveMessageFull.length) return;
+
+        const nextChar = loveMessageFull[charIndex];
+        pageText += nextChar;
+        box.textContent = pageText;
+
+        if (box.scrollHeight > box.clientHeight) {
+            // This character overflowed the space available above the tree.
+            // Back it out, briefly pause, then clear and start a fresh page
+            // continuing from that same character.
+            pageText = pageText.slice(0, -1);
+            box.textContent = pageText;
+
+            setTimeout(() => {
+                pageText = '';
+                box.textContent = '';
+                setTimeout(typeNext, typingSpeed);
+            }, pageBreakPause);
+            return;
+        }
+
+        charIndex++;
+        setTimeout(typeNext, typingSpeed);
+    }
+
+    typeNext();
 }
