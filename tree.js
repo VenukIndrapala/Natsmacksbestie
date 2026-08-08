@@ -124,14 +124,13 @@ function startExactTreeGrowth(btnX, btnY) {
         }
     }
 
-    // Updated with the new requested color palette
+    // Updated palette: Removed the dark brown to keep it bright and colorful
     const heartColors = [
         '#FFDA03', // Sunflower Yellow
         '#FF6800', // Fiery Tangerine
         '#FCAE1E', // Marigold
         '#FF7F50', // Coral
         '#F88379', // Coral-Pink
-        '#3D1C02', // Deep Chocolate Brown
         '#FFFDD0', // Cream
         '#FADADD'  // Blush
     ];
@@ -196,7 +195,7 @@ function startExactTreeGrowth(btnX, btnY) {
 
     let branches = [];
     let hearts = [];
-    const MAX_HEARTS = 450; 
+    const MAX_HEARTS = 900; // Increased to make the heart much fuller
 
     function setupBranches() {
         branches.push(new CubicBranch(0, 0, 0, -60, -2, -120, -3, -175, 24, 10, 0));
@@ -265,7 +264,8 @@ function startExactTreeGrowth(btnX, btnY) {
 
             if (state === 'SPAWNING_HEARTS') {
                 if (hearts.length < MAX_HEARTS) {
-                    for (let i = 0; i < 4; i++) {
+                    // Increased from 4 to 8 spawns per frame to match the new higher max amount smoothly
+                    for (let i = 0; i < 8; i++) {
                         if (hearts.length < MAX_HEARTS) {
                             let canopyCenterY = groundY - (250 * treeScale);
                             let heartRadius = 150 * treeScale;
