@@ -368,10 +368,15 @@ function startLoveTypewriter() {
     const box = document.getElementById('loveTextBox');
     if (!box) return;
 
+    // --- Added line to explicitly make text italic ---
+    box.style.fontStyle = 'italic'; 
+
     let charIndex = 0;
     let pageText = '';
     const typingSpeed = 26;
-    const pageBreakPause = 900;
+    
+    // --- Increased from 900 to 1900 (+1 second) ---
+    const pageBreakPause = 1900; 
 
     function typeNext() {
         if (charIndex >= loveMessageFull.length) return;
