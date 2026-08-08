@@ -68,16 +68,14 @@ function startExactTreeGrowth(btnX, btnY) {
     let dotY = btnY;
     
     let targetGroundX = width / 2;
-    let groundY = height - 100; // Lowered slightly to ensure canopy room
+    let groundY = height - 100;
     const trunkColor = "#864B24"; 
 
-    // Global scale and offset to optimize for mobile screens
     const treeScale = 0.95; 
     const trunkElongation = 45;
 
     class CubicBranch {
         constructor(sx, sy, cp1x, cp1y, cp2x, cp2y, ex, ey, w0, w1, delay) {
-            // Apply elongation to make the trunk longer and shift canopy up
             let sy_adj = sy === 0 ? 0 : sy - trunkElongation;
             let cp1y_adj = sy === 0 ? cp1y - (trunkElongation/2) : cp1y - trunkElongation;
             let cp2y_adj = cp2y - trunkElongation;
@@ -126,16 +124,15 @@ function startExactTreeGrowth(btnX, btnY) {
         }
     }
 
-    // --- Heart Particle System ---
     const heartColors = ['#ff4d6d', '#ff758f', '#ff8fa3', '#c9184a', '#a01a58', '#d81b60', '#e5383b'];
 
     class HeartParticle {
         constructor(x, y) {
             this.x = x;
             this.y = y;
-            this.size = Math.random() * 5 + 4.5; // Random size
+            this.size = Math.random() * 5 + 4.5; 
             this.color = heartColors[Math.floor(Math.random() * heartColors.length)];
-            this.angle = (Math.random() - 0.5) * 0.4; // Slight tilt
+            this.angle = (Math.random() - 0.5) * 0.4; 
             this.flutterSpeed = Math.random() * 0.03 + 0.015;
             this.flutterOffset = Math.random() * Math.PI * 2;
             this.scale = 0; 
@@ -144,7 +141,7 @@ function startExactTreeGrowth(btnX, btnY) {
 
         update() {
             if (this.scale < this.targetScale) {
-                this.scale += 0.06; // Pop-in speed
+                this.scale += 0.06; 
             }
         }
 
@@ -152,7 +149,6 @@ function startExactTreeGrowth(btnX, btnY) {
             ctx.save();
             ctx.translate(this.x, this.y);
             
-            // Add a subtle flutter effect once fully grown
             let currentScale = this.scale;
             if (this.scale >= this.targetScale) {
                 currentScale += Math.sin(Date.now() * this.flutterSpeed + this.flutterOffset) * 0.08;
@@ -162,7 +158,6 @@ function startExactTreeGrowth(btnX, btnY) {
             ctx.rotate(this.angle);
             ctx.fillStyle = this.color;
             
-            // Draw exact bezier heart shape
             ctx.beginPath();
             let top = -this.size * 0.3;
             ctx.moveTo(0, top);
@@ -174,18 +169,16 @@ function startExactTreeGrowth(btnX, btnY) {
         }
     }
 
-    // Math function to constrain points inside a perfect heart shape
     function getHeartPoint(centerX, centerY, radius) {
         while (true) {
             let nx = (Math.random() * 2.4) - 1.2;
             let ny = (Math.random() * 2.4) - 1.2;
             
-            // Heart mathematical equation: (x^2 + y^2 - 1)^3 - x^2 * y^3 <= 0
             let val = Math.pow(nx*nx + ny*ny - 1, 3) - (nx*nx * Math.pow(ny, 3));
             if (val <= 0) {
                 return { 
                     x: centerX + nx * radius, 
-                    y: centerY - ny * radius // Flipped because canvas Y goes down
+                    y: centerY - ny * radius 
                 };
             }
         }
@@ -196,15 +189,24 @@ function startExactTreeGrowth(btnX, btnY) {
     const MAX_HEARTS = 450; 
 
     function setupBranches() {
+        // Trunk
         branches.push(new CubicBranch(0, 0, 0, -60, -2, -120, -3, -175, 24, 10, 0));
-        branches.push(new CubicBranch(-2, -88, -25, -114, -92, -100, -118, -126, 6, 0.1, 12));
+        
+        // --- Bottom branches ---
+        // Lower-left (Adjusted tip to point upwards at ~45-degree angle)
+        branches.push(new CubicBranch(-2, -88, -35, -114, -75, -145, -100, -188, 6, 0.1, 12));
+        // Upper-right
         branches.push(new CubicBranch(-1.7, -117, 18, -136, 48, -128, 70, -150, 3.4, 0.1, 40));
+        
+        // --- Top branches ---
         branches.push(new CubicBranch(-3, -175, -30, -206, -55, -246, -63, -276, 7, 2.4, 55));
         branches.push(new CubicBranch(-63, -276, -76, -288, -85, -298, -92, -306, 2.4, 0.1, 78));
         branches.push(new CubicBranch(-63, -276, -66, -290, -68, -302, -70, -313, 2.4, 0.1, 78));
+        
         branches.push(new CubicBranch(-3, -175, 24, -197, 41, -217, 47, -234, 7, 2.4, 55));
         branches.push(new CubicBranch(47, -234, 59, -246, 68, -257, 75, -266, 2.4, 0.1, 78));
         branches.push(new CubicBranch(47, -234, 51, -248, 54, -260, 56, -271, 2.4, 0.1, 78));
+        
         branches.push(new CubicBranch(-3, -175, -2, -213, 3, -252, 6, -288, 5.2, 0.1, 55));
         branches.push(new CubicBranch(5, -266, -1, -280, -5, -294, -11, -306, 1.8, 0.1, 80));
         branches.push(new CubicBranch(5, -266, 10, -280, 15, -294, 19, -304, 1.8, 0.1, 80));
@@ -220,7 +222,6 @@ function startExactTreeGrowth(btnX, btnY) {
     function animate() {
         ctx.clearRect(0, 0, width, height);
 
-        // Ground line
         ctx.strokeStyle = "#1a1a1a";
         ctx.lineWidth = 2;
         ctx.beginPath();
@@ -257,17 +258,14 @@ function startExactTreeGrowth(btnX, btnY) {
 
             ctx.restore();
 
-            // Transition to spawning hearts once branches finish
             if (allGrown && state === 'GROWING_TREE') {
                 state = 'SPAWNING_HEARTS';
             }
 
             if (state === 'SPAWNING_HEARTS') {
-                // Spawn multiple hearts per frame until max is reached
                 if (hearts.length < MAX_HEARTS) {
                     for (let i = 0; i < 4; i++) {
                         if (hearts.length < MAX_HEARTS) {
-                            // Calculate center of canopy dynamically based on scale
                             let canopyCenterY = groundY - (250 * treeScale);
                             let heartRadius = 150 * treeScale;
                             
@@ -277,7 +275,6 @@ function startExactTreeGrowth(btnX, btnY) {
                     }
                 }
 
-                // Draw and update all active hearts
                 hearts.forEach(h => {
                     h.update();
                     h.draw(ctx);
