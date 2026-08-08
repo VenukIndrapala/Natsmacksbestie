@@ -253,7 +253,7 @@ body.active .lamp-glow {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: #fce1e6; /* Adjusted to match target background warmth */
+    background-color: #fce1e6;
     display: none;
     justify-content: center;
     align-items: center;
@@ -347,16 +347,12 @@ body.active .lamp-glow {
     height: 100%;
 }
 
-/* 
-   Typewriter text styling. Starts out wide for the space above the tree canopy,
-   and smoothly switches to narrow left-aligned via JS when overflowing.
-*/
 .love-text-box {
     position: absolute;
     top: 6%;
     left: 5%;
-    width: 90%; /* Starts wide for the space above the tree */
-    max-height: 24vh; /* Keeps the first paragraph above the canopy */
+    width: 90%; 
+    max-height: 24vh; 
     overflow: hidden;
     color: #c2185b;
     font-size: 0.82rem;
@@ -367,7 +363,7 @@ body.active .lamp-glow {
     white-space: pre-wrap;
     word-wrap: break-word;
     pointer-events: none;
-    transition: width 0.4s ease, max-height 0.4s ease;
+    transition: width 0.9s ease, max-height 0.9s ease;
 }
 
 .love-text-box.narrow {
