@@ -75,7 +75,6 @@ function startExactTreeGrowth(btnX, btnY) {
     const treeScale = 0.95; 
     const trunkElongation = 45;
 
-    // --- Added: tree slide-to-the-right + hearts falling out of the canopy ---
     let treeOffsetX = 0;
     const targetOffsetX = width * 0.25;
     let movingStarted = false;
@@ -131,15 +130,14 @@ function startExactTreeGrowth(btnX, btnY) {
         }
     }
 
-    // Updated palette: Removed the dark brown to keep it bright and colorful
     const heartColors = [
-        '#FFDA03', // Sunflower Yellow
-        '#FF6800', // Fiery Tangerine
-        '#FCAE1E', // Marigold
-        '#FF7F50', // Coral
-        '#F88379', // Coral-Pink
-        '#FFFDD0', // Cream
-        '#FADADD'  // Blush
+        '#FFDA03',
+        '#FF6800',
+        '#FCAE1E',
+        '#FF7F50',
+        '#F88379',
+        '#FFFDD0',
+        '#FADADD'
     ];
 
     class HeartParticle {
@@ -186,7 +184,6 @@ function startExactTreeGrowth(btnX, btnY) {
         }
     }
 
-    // Added: particle that detaches from the canopy and falls/flutters down
     class FallingHeart {
         constructor(x, y, color) {
             this.x = x;
@@ -244,7 +241,7 @@ function startExactTreeGrowth(btnX, btnY) {
 
     let branches = [];
     let hearts = [];
-    const MAX_HEARTS = 900; // Increased to make the heart much fuller
+    const MAX_HEARTS = 900; 
 
     function setupBranches() {
         branches.push(new CubicBranch(0, 0, 0, -60, -2, -120, -3, -175, 24, 10, 0));
@@ -255,114 +252,116 @@ function startExactTreeGrowth(btnX, btnY) {
         branches.push(new CubicBranch(-63, -276, -66, -290, -68, -302, -70, -313, 2.4, 0.1, 78));
         branches.push(new CubicBranch(-3, -175, 24, -197, 41, -217, 47, -234, 7, 2.4, 55));
         branches.push(new CubicBranch(47, -234, 59, -246, 68, -257, 75, -266, 2.4, 0.1, 78));
-        branches.push(new CubicBranch(47, -234, 51, -248, 54, -260, 56, -271, 2.4, 0.1, 78));
-        branches.push(new CubicBranch(-3, -175, -2, -213, 3, -252, 6, -288, 5.2, 0.1, 55));
-        branches.push(new CubicBranch(5, -266, -1, -280, -5, -294, -11, -306, 1.8, 0.1, 80));
-        branches.push(new CubicBranch(5, -266, 10, -280, 15, -294, 19, -304, 1.8, 0.1, 80));
+        branches.push(new CubicBranch(47, -234, 51, -247, 54, -259, 56, -269, 2.4, 0.1, 78));
+        branches.push(new CubicBranch(-55, -246, -68, -252, -80, -257, -90, -262, 3, 0.1, 80));
+        branches.push(new CubicBranch(41, -217, 52, -222, 62, -226, 70, -230, 3, 0.1, 80));
+        branches.push(new CubicBranch(-75, -145, -88, -152, -100, -157, -110, -162, 3, 0.1, 40));
+        branches.push(new CubicBranch(48, -128, 58, -132, 67, -135, 75, -138, 3, 0.1, 60));
+        branches.push(new CubicBranch(10, -70, 30, -85, 60, -90, 85, -100, 3, 0.1, 30));
     }
 
-    function drawDot(x, y, radius, color) {
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.fill();
-    }
+    let growingFinished = false;
 
-    function animate() {
+    function renderTreeFrame() {
         ctx.clearRect(0, 0, width, height);
-
-        ctx.strokeStyle = "#1a1a1a";
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(0, groundY);
-        ctx.lineTo(width, groundY);
-        ctx.stroke();
-
+        
         if (state === 'FALLING_DOT') {
-            ctx.shadowBlur = 12;
-            ctx.shadowColor = "#e91e63";
-            drawDot(dotX, dotY, 6, "#e91e63");
-            ctx.shadowBlur = 0;
-
-            dotY += 12; 
-            dotX += (targetGroundX - dotX) * 0.1; 
-
+            dotY += 14; 
             if (dotY >= groundY) {
-                state = 'GROWING_TREE';
-                setupBranches(); 
+                dotY = groundY;
+                state = 'SPLAT';
             }
-        } 
-        else if (state === 'GROWING_TREE' || state === 'SPAWNING_HEARTS') {
-            ctx.save();
+            
+            ctx.fillStyle = trunkColor;
             ctx.beginPath();
-            ctx.rect(0, 0, width, groundY - 1); 
-            ctx.clip();
+            ctx.arc(dotX, dotY, 4, 0, Math.PI * 2);
+            ctx.fill();
+            
+        } else if (state === 'SPLAT') {
+            ctx.fillStyle = trunkColor;
+            ctx.beginPath();
+            ctx.ellipse(dotX, dotY, 18, 4, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            setTimeout(() => {
+                state = 'GROWING';
+                setupBranches();
+            }, 300);
+            
+        } else if (state === 'GROWING') {
+            ctx.strokeStyle = '#222';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, groundY);
+            ctx.lineTo(width, groundY);
+            ctx.stroke();
 
-            let allGrown = true;
-            branches.forEach(branch => {
-                branch.update();
-                branch.draw(ctx, targetGroundX + treeOffsetX, groundY);
-                if (branch.progress < 1) allGrown = false;
+            if (treeOffsetX < targetOffsetX) {
+                treeOffsetX += (targetOffsetX - treeOffsetX) * 0.012; 
+            }
+            if (treeOffsetX > 10 && !movingStarted) {
+                movingStarted = true;
+            }
+
+            let baseX = dotX + treeOffsetX;
+            let baseY = groundY;
+
+            let allFinished = true;
+            branches.forEach(b => {
+                b.update();
+                b.draw(ctx, baseX, baseY);
+                if (b.progress < 1) allFinished = false;
             });
 
-            ctx.restore();
+            if (allFinished && !growingFinished) {
+                growingFinished = true;
+                
+                let cx = 0;
+                let cy = -225 * treeScale - trunkElongation;
+                let cr = 135 * treeScale;
 
-            if (allGrown && state === 'GROWING_TREE') {
-                state = 'SPAWNING_HEARTS';
+                let hCount = 0;
+                let hInterval = setInterval(() => {
+                    for (let i = 0; i < 4; i++) {
+                        let pt = getHeartPoint(cx, cy, cr);
+                        hearts.push(new HeartParticle(pt.x, pt.y));
+                        hCount++;
+                        if (hCount >= MAX_HEARTS) {
+                            clearInterval(hInterval);
+                            break;
+                        }
+                    }
+                }, 10);
             }
 
-            if (state === 'SPAWNING_HEARTS') {
-                if (hearts.length < MAX_HEARTS) {
-                    // Increased from 4 to 8 spawns per frame to match the new higher max amount smoothly
-                    for (let i = 0; i < 8; i++) {
-                        if (hearts.length < MAX_HEARTS) {
-                            let canopyCenterY = groundY - (250 * treeScale);
-                            let heartRadius = 150 * treeScale;
-                            
-                            let pt = getHeartPoint(targetGroundX, canopyCenterY, heartRadius);
-                            hearts.push(new HeartParticle(pt.x, pt.y));
-                        }
-                    }
-                } else {
-                    // Added: once the canopy is full, start sliding the tree
-                    // right (smoothly eased, not a cut) and begin shedding
-                    // falling hearts from the canopy.
-                    movingStarted = true;
-                }
+            hearts.forEach(h => {
+                h.update();
+                h.draw(ctx, baseX);
+            });
 
-                hearts.forEach(h => {
-                    h.update();
-                    h.draw(ctx, treeOffsetX);
-                });
+            if (growingFinished && hearts.length > 50 && Math.random() < 0.04) {
+                let index = Math.floor(Math.random() * hearts.length);
+                let detached = hearts.splice(index, 1)[0];
+                let absoluteX = baseX + detached.x;
+                let absoluteY = groundY + detached.y;
+                fallingHearts.push(new FallingHeart(absoluteX, absoluteY, detached.color));
+            }
 
-                if (movingStarted) {
-                    treeOffsetX += (targetOffsetX - treeOffsetX) * 0.035;
-
-                    if (hearts.length > 0 && Math.random() < 0.6) {
-                        let source = hearts[Math.floor(Math.random() * hearts.length)];
-                        fallingHearts.push(new FallingHeart(source.x + treeOffsetX, source.y, source.color));
-                    }
-
-                    for (let i = fallingHearts.length - 1; i >= 0; i--) {
-                        let fh = fallingHearts[i];
-                        fh.update();
-                        fh.draw(ctx);
-                        if (fh.y > groundY + 30 || fh.x < -30) {
-                            fallingHearts.splice(i, 1);
-                        }
-                    }
+            for (let i = fallingHearts.length - 1; i >= 0; i--) {
+                let fh = fallingHearts[i];
+                fh.update();
+                fh.draw(ctx);
+                if (fh.y > height + 20) {
+                    fallingHearts.splice(i, 1);
                 }
             }
         }
-
-        requestAnimationFrame(animate);
+        
+        requestAnimationFrame(renderTreeFrame);
     }
-    animate();
+    
+    renderTreeFrame();
 }
-
-// --- Added: typewriter love message shown above the tree ---
-const loveMessageFull = `Hey Natti, 
-So this was meant for bestie clearly, but I just felt like I should annoy her now even though I’ll probably be sending this at 2am in the morning and she’s definitely going to be rebooting when she reads this, she’s going to see the tree and go “meh mokada meh pissu” XD. But just wanted to come here and say that you’ve had quite the hectic week and you haven’t been feeling that great and honestly you are genuinely doing an amazing job hanging in there that strong with everything that’s going on and I couldn’t be more proud of you, you can give some of that to the rest of the world don’t gate keep thanks ._. And now bestie is supposed to come today but I think even bestie is depressed and even she doesn’t want to say hello. And even if she does I know you’ll be knocking her out in seconds cause you are just strong independent and really cool like that VERY SLAY GURL. I’m sure she’s reading this like “ugh there’s more to this paragraph” so guess what I’m going to do I’m going to keep dragging this sentence out like this where I’m just typing the word typing for the funsies of typing so you’ll have to read all of this and there’s literally no point in reading this cause this is just pure rage baiting :p but if you made it this far and ur still here, miss you ma’am and by miss I mean I mean properly hanging out with you without having to be cautious this much and all stressed I really miss that, but hopefully with locking in and praying triples and quadruples things will be better and I can finally have my missing rib guys thanks :) so yeah stay strong stay happy and always keep that beautiful smile of yours with you don’t ever loose it okay and like always if there’s anything you want to talk about I am here to talk and make it worse :D (if you made it this far early in the morning I’m genuinely impressed and I’ll see you at yf Ma’am, I’m going to do a hand sign when I see you today just know that’s me saying you look really beautiful today cause I can’t say it out loud so yeah see you then)`;
 
 function startLoveTypewriter() {
     const box = document.getElementById('loveTextBox');
@@ -370,8 +369,12 @@ function startLoveTypewriter() {
 
     let charIndex = 0;
     let pageText = '';
+    
     const typingSpeed = 26;
-    const pageBreakPause = 900;
+    const pageBreakPause = 1400; 
+    let isNarrow = false; 
+
+    const loveMessageFull = "made it this far and ur still here, miss you ma’am and by miss I mean I mean properly hanging out with you without having to be cautious this much and all stressed I really miss that, but hopefully with locking in and praying triples and quadruples things will be better and I can finally have my missing rib guys thanks :) so yeah stay strong stay happy and always keep that beautiful smile of yours with you don’t ever loose it okay and like always if there’s anything you want to talk about..."; 
 
     function typeNext() {
         if (charIndex >= loveMessageFull.length) return;
@@ -381,13 +384,15 @@ function startLoveTypewriter() {
         box.textContent = pageText;
 
         if (box.scrollHeight > box.clientHeight) {
-            // This character overflowed the space available above the tree.
-            // Back it out, briefly pause, then clear and start a fresh page
-            // continuing from that same character.
             pageText = pageText.slice(0, -1);
             box.textContent = pageText;
 
             setTimeout(() => {
+                if (!isNarrow) {
+                    isNarrow = true;
+                    box.classList.add('narrow');
+                }
+                
                 pageText = '';
                 box.textContent = '';
                 setTimeout(typeNext, typingSpeed);
